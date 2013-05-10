@@ -22,6 +22,7 @@ class Scene
 	public var parent:Scene;
 	public var camera:Camera;	
 	public var offset(get_offset, set_offset) :Point;
+	public var atlas:Atlas;
 	
 	public var visible:Bool;	
 	public var active:Bool;	
@@ -81,6 +82,9 @@ class Scene
 	
 	public function ready() :Void
 	{
+		if (atlas != null) {
+			atlas.showAll();
+		}
 		if (transitionOnTime == 0) { 
 			active = true; 
 		} else {
@@ -143,6 +147,9 @@ class Scene
 		if (on_Exit != null && ending && transitionTime == 0)
 		{ 
 			_exit();
+			if (atlas != null) {
+				atlas.hideAll();
+			}
 			on_Exit(this);
 		}
 	}
@@ -168,7 +175,7 @@ class Scene
 		entities.add( e );
 	}
 	
-	public function remove( e:Entity, ?free:Bool = true ) :Bool {
+	public function remove( e:Entity, ?free:Bool = false ) :Bool {
 		
 		entities.remove(e, free);
 		return true;

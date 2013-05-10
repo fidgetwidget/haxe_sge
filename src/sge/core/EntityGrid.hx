@@ -7,23 +7,27 @@ import sge.interfaces.IHasBounds;
 import nme.geom.Point;
 
 /**
- * ...
+ * Spacial Grid Entity Manager
+ * 
+ * Each entity added to the manager is placed in one or more cells
+ * based on the entities bounding box.
+ * Entities can be queried based on a bounding area.
+ * 
  * @author fidgetwidget
  */
 
 class EntityGrid extends EntityManager
 {
 	
-	public static var CELL_WIDTH:Int = 32;
-	public static var CELL_HEIGHT:Int = 32;
-	
 	/*
 	 * Properties
 	 */
-	public var gridWidth(default, null):Int;
-	public var gridHeight(default, null):Int;
-	public var rowCount(default, null):Int;
-	public var colCount(default, null):Int;	
+	public var gridWidth	(default, null):Int;
+	public var gridHeight	(default, null):Int;
+	public var cellWidth	(default, null):Int;
+	public var cellHeight	(default, null):Int;
+	public var rowCount		(default, null):Int;
+	public var colCount		(default, null):Int;	
 	
 	/*
 	 * Members
@@ -44,28 +48,35 @@ class EntityGrid extends EntityManager
 	 * @param	width - the width of the grid (a fixed value)
 	 * @param	height - the height of the grid (a fixed value)
 	 */
-	public function new(width:Int, height:Int) 
+	public function new(gridWidth:Int = 1024, gridHeight:Int = 1024, cellWidth:Int = 32, cellHeight:Int = 32) 
 	{
 		super();
 		
-		gridWidth = width;
-		gridHeight = height;		
-		rowCount = Math.floor(height / CELL_HEIGHT);
-		colCount = Math.floor(width / CELL_WIDTH);
+		this.gridWidth = gridWidth;
+		this.gridHeight = gridHeight;
+		this.cellWidth = cellWidth;
+		this.cellHeight = cellHeight;
+		
+		rowCount = Math.floor(gridHeight / cellHeight);
+		colCount = Math.floor(gridWidth / cellWidth);
 		
 		_bounds = new AABB();
 		_cells = new IntHash<List<Entity>>();
 		_entityCellHash = new IntHash<List<Int>>();
 		_indexes = new List<Int>();
 		
-		_bounds.setRect(0, 0, width, height);
+		_bounds.setRect(0, 0, gridWidth, gridHeight);
+	}
+	
+	public function testAddEntity( e:Entity ) :Bool {
+		return _bounds.containsAabb(_aabb);
 	}
 	
 	// add the entity to the appropriate cells based on its bounds
 	private override function _addEntity( e:Entity ) :Void 
 	{		
 		_aabb = e.getBounds();
-		if (!_bounds.intersectsAabb(_aabb)) {
+		if (!_bounds.containsAabb(_aabb)) {
 			throw "Entity's Bounds are out of range of this EntityGrid.";
 		}
 		
@@ -155,10 +166,10 @@ class EntityGrid extends EntityManager
 		// make sure we empty it first
 		_indexes.clear();
 		
-		var fr:Int = Math.floor(area.minY / CELL_HEIGHT); // first row
-		var lr:Int = Math.floor(area.maxY / CELL_HEIGHT); // last row
-		var fc:Int = Math.floor(area.minX / CELL_WIDTH);  // first col
-		var lc:Int = Math.floor(area.maxX / CELL_WIDTH);  // last col
+		var fr:Int = Math.floor(area.minY / cellHeight); // first row
+		var lr:Int = Math.floor(area.maxY / cellHeight); // last row
+		var fc:Int = Math.floor(area.minX / cellWidth);  // first col
+		var lc:Int = Math.floor(area.maxX / cellWidth);  // last col
 		for (r in fr...lr) {
 			for (c in fc...lc)
 				_indexes.add( get_index(r, c) );
@@ -168,7 +179,7 @@ class EntityGrid extends EntityManager
 	///get the 1D index for the row & col value
 	private inline function get_index( row:Int, col:Int ) :Int
 	{
-		return (CELL_WIDTH * row) + col;
+		return (cellWidth * row) + col;
 	}
 	
 	/// get the 1D index for the x,y position
@@ -179,8 +190,8 @@ class EntityGrid extends EntityManager
 		return get_index( r, c );
 	}
 	
-	public inline function get_row( y:Float ) :Int { return Math.floor(y / CELL_HEIGHT);  }
-	public inline function get_col( x:Float ) :Int { return Math.floor(x / CELL_WIDTH);   }
+	public inline function get_row( y:Float ) :Int { return Math.floor(y / cellHeight);  }
+	public inline function get_col( x:Float ) :Int { return Math.floor(x / cellWidth);   }
 	
 	
 	

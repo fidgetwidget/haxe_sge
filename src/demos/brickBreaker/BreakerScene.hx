@@ -55,6 +55,7 @@ class BreakerScene extends Scene
 	public function new() 
 	{
 		super();
+		atlas = new Atlas();
 		id = "BreakerScene";
 		
 		camera = new Camera();
@@ -63,7 +64,7 @@ class BreakerScene extends Scene
 		player = new Paddle();
 		ball = new Ball();
 		cdata = Physics.getCollisionData();
-		mc = Atlas.makeLayer(0);
+		mc = atlas.makeLayer(0);
 		
 		WIDTH = cast(Engine.properties.get("_STAGE_WIDTH"), Int);
 		HEIGHT = cast(Engine.properties.get("_STAGE_HEIGHT"), Int);

@@ -64,7 +64,7 @@ class Game extends Engine {
 			if (Input.isKeyDown(Keyboard.G) ) {
 				this.readyScene( _physicsScene.id );
 			}
-			if (Input.isKeyDown(Keyboard.H) ) {
+			if (Input.isKeyDown(Keyboard.I) ) {
 				this.readyScene( _pongScene.id );
 			}
 			if (Input.isKeyDown(Keyboard.J) ) {

@@ -45,7 +45,8 @@ class PongScene extends Scene
 	public function new() 
 	{
 		super();
-		this.id = "PongScene";
+		atlas = new Atlas();
+		id = "PongScene";
 		
 		WIDTH = cast(Engine.properties.get("_STAGE_WIDTH"), Int);
 		HEIGHT = cast(Engine.properties.get("_STAGE_HEIGHT"), Int);
@@ -56,7 +57,7 @@ class PongScene extends Scene
 		oldPos = new Point();
 		entities = new EntityManager();
 		camera = new Camera();
-		mc = Atlas.makeLayer(0);
+		mc = atlas.makeLayer(0);
 		screenBounds = new AABB();
 		screenBounds.setRect( 
 		 (WIDTH - 512) * 0.5, 

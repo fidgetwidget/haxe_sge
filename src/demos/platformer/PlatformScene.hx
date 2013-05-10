@@ -10,7 +10,6 @@ import sge.core.Entity;
 import sge.graphics.Draw;
 import sge.io.Input;
 import sge.lib.World;
-import sge.lib.si.Grid;
 import sge.physics.AABB;
 import sge.physics.CollisionData;
 import sge.physics.Physics;
@@ -39,8 +38,8 @@ class PlatformScene extends Scene
 	var dragX:Float;
 	var dragY:Float;
 	
-	var gd:Grid<Entity>; // the grid of entities
-	var egh:IntHash<List<Int>>; // the entity id -> grid id's hash map
+	//var gd:Grid<Entity>; // the grid of entities
+	//var egh:IntHash<List<Int>>; // the entity id -> grid id's hash map
 	var world:World;	
 	var worldBounds:AABB;
 	var currTileType:Int = 1;
@@ -53,8 +52,8 @@ class PlatformScene extends Scene
 		super();
 		
 		id = "PlatformScene";
-		gd = new Grid<Entity>(WIDTH, HEIGHT, rows, cols);
-		egh = new IntHash<List<Int>>();
+		//gd = new Grid<Entity>(WIDTH, HEIGHT, rows, cols);
+		//egh = new IntHash<List<Int>>();
 		
 		camera = new Camera();
 		world = new World(rows, cols);
@@ -160,9 +159,9 @@ class PlatformScene extends Scene
 	
 	override public function render():Void 
 	{
-		Draw.graphics.beginFill(0xCCCCCC, 0.3);
-		Draw.debug_drawAABB( gd, camera );
-		Draw.graphics.endFill();
+		//Draw.graphics.beginFill(0xCCCCCC, 0.3);
+		//Draw.debug_drawAABB( gd, camera );
+		//Draw.graphics.endFill();
 		
 		world.render(camera);			
 		
@@ -184,12 +183,12 @@ class PlatformScene extends Scene
 	override public function add(e:Entity):Void 
 	{
 		super.add(e);
-		egh.set(e.id, gd.insert( e ));
+		//egh.set(e.id, gd.insert( e ));
 	}
 	
 	override public function remove(e:Entity, ?free:Bool = true):Bool 
 	{
-		egh.remove(e.id);
+		//egh.remove(e.id);
 		return super.remove(e, free);
 	}
 	

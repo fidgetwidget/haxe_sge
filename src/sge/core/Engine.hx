@@ -252,7 +252,7 @@ class Engine
 	 */
 	public static function initEntityManager() 
 	{
-		_entities = new Hash<Array<Entity>>();
+		_entities = new Hash<FastList<Entity>>();
 		_entTypes = new IntHash<String>();
 		_entityId = 0;
 	}
@@ -266,13 +266,13 @@ class Engine
 		
 		// if the type is new
 		if ( _entities.get(_typeName) == null ) {
-			_entities.set(_typeName, new Array<Entity>());
+			_entities.set(_typeName, new FastList<Entity>());
 		}		
 		
 		// if there aren't any, then add one.
-		if ( _entities.get(_typeName).length == 0 ) {
+		if ( _entities.get(_typeName).isEmpty() ) {
 			var e = Type.createInstance(type, []);
-			_entities.get(_typeName).push( e );
+			_entities.get(_typeName).add( e );
 		}
 		
 		return cast _entities.get(_typeName).pop();
@@ -286,7 +286,7 @@ class Engine
 		_typeName = Type.getClassName(Type.getClass(e));
 		if ( _entities.exists(_typeName) ) {
 			e.free();
-			_entities.get(_typeName).push(e);
+			_entities.get(_typeName).add(e);
 		} else {
 			e.free();
 		}		
@@ -310,7 +310,7 @@ class Engine
 	
 	/// Members
 	private static var _entityId:Int;
-	private static var _entities:Hash<Array<Entity>>;
+	private static var _entities:Hash<FastList<Entity>>;
 	private static var _entTypes:IntHash<String>;
 	private static var _typeName:String;	
 	//** -------------------------------------------------------------------

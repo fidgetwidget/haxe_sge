@@ -50,7 +50,7 @@ class PhysicsTestScene extends Scene
 	static var QT_WIDTH:Int = 1024;
 	static var QT_HEIGHT:Int = 1024;
 	
-	
+	// TODO: switch to using the EntityTree EntityManager over manually handling the quad tree
 	
 	var qt:QuadTree<Entity>;
 	var eqh:IntHash<QuadTree<Entity>>;
@@ -76,6 +76,7 @@ class PhysicsTestScene extends Scene
 	public function new() 
 	{
 		super();
+		atlas = new Atlas();
 		
 		qt = new QuadTree<Entity>(0, 0, QT_WIDTH, QT_HEIGHT);
 		eqh = new IntHash<QuadTree<Entity>>();
@@ -84,7 +85,7 @@ class PhysicsTestScene extends Scene
 		
 		id = "DemoScene";
 		
-		mc = Atlas.makeLayer(0);
+		mc = atlas.makeLayer(0);
 		drawQuads = new FastList<Box>();
 		
 		player = new Player();	
@@ -148,7 +149,8 @@ class PhysicsTestScene extends Scene
 			 drawingPlayerPath) ) {				
 				
 				drawingPlayerPath = true;	
-				player.path.getLast().toPoint(point);
+				if (player.path.getLast() != null) 
+					player.path.getLast().toPoint(point);
 				
 				if (point == null) {
 					player.addPathPoint( player.transform.position.clone() );
@@ -281,15 +283,12 @@ class PhysicsTestScene extends Scene
 				/// BLOCK COLLIDES WITH WALL
 				if ( smallestQuad == null ) {
 					
-					remove( e );
 					if (e.className == "Block") {
 						var block:Block = cast(e, Block);
-						
-						remove(block, true);
-						mc.removeChild(block.mc);
-						blocks.remove( block );			
-					}					
-					Engine.free( e );
+						blocks.remove( block );
+					}
+					mc.removeChild(e.mc);
+					remove(e, true); // this will "free" the item
 			
 				} else {
 					

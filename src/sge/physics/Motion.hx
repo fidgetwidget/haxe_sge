@@ -40,9 +40,9 @@ class Motion implements IRecyclable
 	public var max_v				: Float = 0;
 	
 	//* Rotation Acceleration, Velocity & Friction/Drag
-	public var ar					: Float;
-	public var vr					: Float;
-	public var fr					: Float;
+	public var ar					: Float = 0;
+	public var vr					: Float = 0;
+	public var fr					: Float = 1;
 	//* (Optional) Maximum Rotation Velocity
 	public var max_r				: Float = 0;
 	
@@ -62,6 +62,7 @@ class Motion implements IRecyclable
 	public function new( vx:Float = 0, vy:Float = 0, fx:Float = 1, fy:Float = 1, vr:Float = 0, fr:Float = 1 ) 
 	{
 		_a = new Vec2();
+		ar = 0;
 		_v = new Vec2();		
 		_fv = new Vec2();
 		set( vx, vy, fx, fy, vr, fr );

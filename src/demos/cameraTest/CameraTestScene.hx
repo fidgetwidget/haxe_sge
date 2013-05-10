@@ -16,7 +16,6 @@ import sge.core.Entity;
 import sge.core.Engine;
 import sge.core.Scene;
 import sge.geom.Path;
-import sge.lib.si.Grid;
 import sge.io.Input;
 import sge.graphics.Draw;
 import sge.graphics.Atlas;
@@ -73,7 +72,7 @@ class CameraTestScene extends Scene
 	public function new() 
 	{			
 		super ();		
-		
+		atlas = new Atlas();
 		id = "FlightSpaceScene";
 		
 		camera = new Camera();
@@ -84,9 +83,9 @@ class CameraTestScene extends Scene
 		cdata = Physics.getCollisionData();
 		
 		targetType = Camera.TARGET_FIXED;
-		bg = Atlas.makeLayer(0);
-		mg = Atlas.makeLayer(1);
-		fg = Atlas.makeLayer(2);		
+		bg = atlas.makeLayer(0);
+		mg = atlas.makeLayer(1);
+		fg = atlas.makeLayer(2);		
 		
 		var stage = Engine.root.stage;
 		var centerX:Float = GRID_WIDTH * 0.5;
@@ -112,7 +111,7 @@ class CameraTestScene extends Scene
 		mg.addChild(player.mc);
 		
 		for (i in 0...BOX_COUNT) {
-			var block:Block = Block.makeBlock(Rand.instance.between(0, GRID_WIDTH), Rand.instance.between(0, GRID_HEIGHT));
+			var block:Block = Block.makeBlock(Rand.instance.between(30, GRID_WIDTH - 30), Rand.instance.between(30, GRID_HEIGHT - 30));
 			block.motion.vf = 0;
 			block.motion.vx = Rand.instance.between(-50, 50);
 			block.motion.vy = Rand.instance.between(-50, 50);
@@ -152,23 +151,7 @@ class CameraTestScene extends Scene
 #end
 
 	}
-	
-	override public function ready():Void 
-	{
-		super.ready();	
 		
-		Atlas.showLayer(0);
-		Atlas.showLayer(1);
-		Atlas.showLayer(2);
-	}
-	
-	override private function _exit() :Void {
-		
-		Atlas.hideLayer(0);
-		Atlas.hideLayer(1);
-		Atlas.hideLayer(2);
-	}
-	
 	override private function _handleInput(delta:Float):Void 
 	{
 		localX = Input.mouseX + camera.x;
