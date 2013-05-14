@@ -90,8 +90,8 @@ class Engine
 		_graphics = root.graphics;
 		Input.init( _stage );
 		Draw.init( _graphics );
-		initEntityManager();
-		initAssetManager();
+		EntityFactory.init();
+		AssetManager.init();
 		Rand.init( Std.int(_start) );
 		Actuate.reset(); // not nessesary, but just here to remind that you have access to Actuate
 		
@@ -231,10 +231,7 @@ class Engine
 	/// -------------------------------------------------------------------
 	///  Asset Manager
 	/// -------------------------------------------------------------------
-	public static function initAssetManager() :Void {
-		AssetManager.init();
-	}	
-	
+
 	public static function saveBitmap( source:Dynamic ) :Bool {
 		return AssetManager.saveBitmap( source );
 	}	
@@ -246,36 +243,13 @@ class Engine
 	/// -------------------------------------------------------------------
 	///  Entity Recycling
 	/// -------------------------------------------------------------------
-	// TODO: replace this with an entity factory class at some point
-	/**
-	 * Initializer
-	 */
-	public static function initEntityManager() 
-	{
-		_entities = new Hash<FastList<Entity>>();
-		_entTypes = new IntHash<String>();
-		_entityId = 0;
-	}
 		
 	/**
 	 * Get an entity of the given type
 	 */
 	public static function getEntity<E:Entity>( type:Class<E>, forceNew:Bool = false ) :E {
 		
-		_typeName = Type.getClassName(type);
-		
-		// if the type is new
-		if ( _entities.get(_typeName) == null ) {
-			_entities.set(_typeName, new FastList<Entity>());
-		}		
-		
-		// if there aren't any, then add one.
-		if ( _entities.get(_typeName).isEmpty() ) {
-			var e = Type.createInstance(type, []);
-			_entities.get(_typeName).add( e );
-		}
-		
-		return cast _entities.get(_typeName).pop();
+		return EntityFactory.getEntity(type, forceNew);
 	}
 	
 	/**
@@ -283,36 +257,9 @@ class Engine
 	 */
 	public static function free( e:Entity ) :Void {		
 		
-		_typeName = Type.getClassName(Type.getClass(e));
-		if ( _entities.exists(_typeName) ) {
-			e.free();
-			_entities.get(_typeName).add(e);
-		} else {
-			e.free();
-		}		
+		EntityFactory.free(e);
 	}	
 	
-	/**
-	 * Get the next entity ID
-	 * @return
-	 */
-	public static function getNextEntityId() :Int {
-		return _entityId++;
-	}
-	
-	/**
-	 * Get the last used entity ID
-	 * @return
-	 */
-	public static function getPrevEntityId() :Int {
-		return _entityId;
-	}	
-	
-	/// Members
-	private static var _entityId:Int;
-	private static var _entities:Hash<FastList<Entity>>;
-	private static var _entTypes:IntHash<String>;
-	private static var _typeName:String;	
 	//** -------------------------------------------------------------------
 	
 	

@@ -60,7 +60,7 @@ class Entity implements IHasBounds, implements IHasId, implements IRecyclable
 	 */
 	public function new() 
 	{
-		id = Engine.getNextEntityId();
+		id = EntityFactory.getNextEntityId();
 		_t = new Transform();
 		className = Type.getClassName(Entity);
 	}
@@ -120,29 +120,31 @@ class Entity implements IHasBounds, implements IHasId, implements IRecyclable
 		return this.collider.collideAABB(aabb, cdata);
 	}
 	
-	public function collideAndResolve( collider:Collider, resolver:CollisionResolver ) :Void {
+	public function collideAndResolve( collider:Collider, resolver:CollisionResolver = null ) :Void {
 		
 		// TODO: add in collision resolution types
-		
-		
+		// Default: minumum adjustment + zero the relevant velocity
+		throw "collideAndResolve is not yet implemented.";
 	}
 	
 	
 	/*
 	 * Tween Functions
 	 */
-	public function moveBy( x:Float = 0, y:Float = 0, t:Float = 1 ) :Void {
-		moveTo(x + x, y + y, t);
+	/// Default duration is 0.33 (or 1/3rd of a second)
+	 
+	public function moveBy( x:Float, y:Float, time:Float = 0.33 ) :Void {
+		moveTo(this.x + x, this.y + y, time);
 	}	
-	public function moveTo( x:Float, y:Float, t:Float ) :Void {
-		Actuate.tween(this, t, { x:x, y:y } );
+	public function moveTo( x:Float, y:Float, time:Float = 0.33 ) :Void {
+		Actuate.tween(this, time, { x:x, y:y } );
 	}
 	
-	public function rotateBy( r:Float = 0, t:Float = 1 ) :Void {
-		rotateTo( rotation + r, t );
+	public function rotateBy( r:Float = 0, time:Float = 0.33 ) :Void {
+		rotateTo( rotation + r, time );
 	}
-	public function rotateTo( r:Float, t:Float ) :Void {
-		Actuate.tween(this, t, { rotation:r } ).smartRotation();
+	public function rotateTo( r:Float, time:Float = 0.33 ) :Void {
+		Actuate.tween(this, time, { rotation:r } ).smartRotation();
 	}
 	
 	/*
@@ -173,6 +175,8 @@ class Entity implements IHasBounds, implements IHasId, implements IRecyclable
 	
 	
 	/// IRecyclable
+	// NOTES: I am not sure if the "free" boolean is really needed (and the isFree test) beyond testing and debugging the factories
+	// so I may change it once I have factories for all of the things I think I will need...
 	public function free() :Void 
 	{
 		_t.free();	

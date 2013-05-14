@@ -100,7 +100,7 @@ class Block extends Entity
 		}
 		_m.vx = Rand.instance.between( -20, 20);
 		_m.vy = Rand.instance.between( -20, 20);
-		_m.vf = 0.0015;
+		_m.vf = 0.005;
 		_m.vr = 0;
 		_m.fr = 0;
 		_wasInMotion = _m.inMotion;

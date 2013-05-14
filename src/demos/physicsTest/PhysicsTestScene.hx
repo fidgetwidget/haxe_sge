@@ -10,6 +10,7 @@ import nme.text.TextField;
 import nme.text.TextFormat;
 import nme.ui.Keyboard;
 import sge.core.EntityManager;
+import sge.core.EntityTree;
 import sge.graphics.Atlas;
 
 import sge.core.Camera;
@@ -17,7 +18,6 @@ import sge.core.Entity;
 import sge.core.Scene;
 import sge.random.Rand;
 import sge.geom.Path;
-import sge.lib.si.QuadTree;
 import sge.physics.AABB;
 import sge.physics.CircleCollider;
 import sge.physics.CollisionData;
@@ -44,17 +44,12 @@ import sge.core.Debug;
 class PhysicsTestScene extends Scene
 {
 	
-	static var WIDTH:Int = 512;
-	static var HEIGHT:Int = 512;
-	
-	static var QT_WIDTH:Int = 1024;
-	static var QT_HEIGHT:Int = 1024;
+	static var TREE_WIDTH:Int = 1024;
+	static var TREE_HEIGHT:Int = 1024;
 	
 	// TODO: switch to using the EntityTree EntityManager over manually handling the quad tree
 	
-	var qt:QuadTree<Entity>;
-	var eqh:IntHash<QuadTree<Entity>>;
-	
+	var tree:EntityTree;
 	/*
 	 * Properties 
 	 */
@@ -77,31 +72,22 @@ class PhysicsTestScene extends Scene
 	{
 		super();
 		atlas = new Atlas();
-		
-		qt = new QuadTree<Entity>(0, 0, QT_WIDTH, QT_HEIGHT);
-		eqh = new IntHash<QuadTree<Entity>>();
-		qt.MAXDEPTH = 8;
-		qt.MAXQUADSIZE = 8;
-		
 		id = "DemoScene";
 		
-		mc = atlas.makeLayer(0);
-		drawQuads = new FastList<Box>();
-		
-		player = new Player();	
 		camera = new Camera();
-		
+		player = new Player();
+		tree = new EntityTree(TREE_WIDTH, TREE_HEIGHT, 8);
+		entities = tree;
 		blocks = new Array<Block>();
-		entities = new EntityManager();
 		path = new Path();
 		ev = new Vec2();
 		ev2 = new Vec2();
+		drawQuads = new FastList<Box>();
 		
-		WIDTH = cast(Engine.properties.get("_STAGE_WIDTH"), Int);
-		HEIGHT = cast(Engine.properties.get("_STAGE_HEIGHT"), Int);
+		mc = atlas.makeLayer(0);
 		
-		camera.width = WIDTH;
-		camera.height = HEIGHT;
+		camera.width = cast(Engine.properties.get("_STAGE_WIDTH"), Int);
+		camera.height = cast(Engine.properties.get("_STAGE_HEIGHT"), Int);
 		camera.x = 0;
 		camera.y = 0;
 		
@@ -116,7 +102,6 @@ class PhysicsTestScene extends Scene
 	override public function free():Void 
 	{
 		super.free();
-		qt.free();
 		// TODO: free up everything else...
 	}
 	
@@ -124,8 +109,8 @@ class PhysicsTestScene extends Scene
 	{
 		super.ready();	
 		
-		centerX = qt.hWidth;
-		centerY = qt.hHeight;
+		centerX = tree.root.hWidth;
+		centerY = tree.root.hHeight;
 		
 		player.x = centerX;
 		player.y = centerY;
@@ -144,7 +129,7 @@ class PhysicsTestScene extends Scene
 		if ( Input.isKeyDown( Keyboard.SHIFT ) && Input.isMouseDown() ) {
 			
 			
-			if ( qt.containsPoint( localX, localY ) &&
+			if ( tree.containsPoint( localX, localY ) &&
 			(player.collider.contains( localX, localY ) ||
 			 drawingPlayerPath) ) {				
 				
@@ -186,10 +171,10 @@ class PhysicsTestScene extends Scene
 		else
 		if ( Input.isMousePressed() && Input.isKeyDown( Keyboard.CONTROL )  ) {
 			
-			if ( qt.containsPoint( localX, localY ) ) {				
+			if ( tree.containsPoint( localX, localY ) ) {				
 				block = Block.makeBlock( localX, localY );
 				_bounds = block.getBounds();
-				if (qt.intersectsAabb( _bounds )) {
+				if ( tree.intersectsAabb( _bounds ) ) {
 					blocks.push( block );
 					mc.addChild(block.mc);
 					add( block );
@@ -204,10 +189,10 @@ class PhysicsTestScene extends Scene
 				
 			}
 			else
-			if ( qt.containsPoint( localX, localY ) ) {				
+			if ( tree.containsPoint( localX, localY ) ) {				
 				block = Block.makeBlock( localX, localY );
 				_bounds = block.getBounds();
-				if (qt.intersectsAabb( _bounds )) {
+				if (tree.intersectsAabb( _bounds )) {
 					blocks.push( block );
 					mc.addChild(block.mc);
 					add( block );
@@ -261,24 +246,24 @@ class PhysicsTestScene extends Scene
 			if (e.className == Type.getClassName(Player)) {
 				
 				/// PLAYER COLLIDES WITH THE WALLS
-				smallestQuad = qt.getSmallestQuadAtAabb( _bounds );
+				smallestQuad = tree.getSmallestFit( _bounds );
 				if ( smallestQuad == null &&
-				qt.intersectsAabb( _bounds ) ) {
+				tree.intersectsAabb( _bounds ) ) {
 					
-					player.collider.collideAABB(qt, cdata);
+					player.collider.collideAABB(tree.root, cdata);
 					if (cdata.px > cdata.py) {
 						player.motion.vy *= -0.9;
-						player.y = Math.floor(player.y + player.radius > qt.bottom ? qt.bottom - player.radius - 1 : qt.top + player.radius);
+						player.y = Math.floor(player.y + player.radius > tree.root.bottom ? tree.root.bottom - player.radius - 1 : tree.root.top + player.radius);
 					} else {
 						player.motion.vx *= -0.9;
-						player.x = Math.floor(player.x + player.radius > qt.right ? qt.right - player.radius - 1 : qt.left + player.radius + 1);
+						player.x = Math.floor(player.x + player.radius > tree.root.right ? tree.root.right - player.radius - 1 : tree.root.left + player.radius + 1);
 					}
 				}	
 				
 			}
 			else
 			{
-				smallestQuad = qt.getSmallestQuadAtAabb( _bounds );
+				smallestQuad = tree.getSmallestFit( _bounds );
 				
 				/// BLOCK COLLIDES WITH WALL
 				if ( smallestQuad == null ) {
@@ -315,7 +300,7 @@ class PhysicsTestScene extends Scene
 					}
 					/// BLOCK COLLIDES WITH PLAYER	
 					playerBounds = player.getBounds();
-					smallestQuad = qt.getSmallestQuadAtAabb( playerBounds );					
+					smallestQuad = tree.getSmallestFit( playerBounds );					
 					if ( smallestQuad != null &&
 					smallestQuad.intersectsAabb( _bounds ) ) {
 						
@@ -333,7 +318,7 @@ class PhysicsTestScene extends Scene
 			}
 				
 			if (e.motion.inMotion && e.state == Entity.DYNAMIC) {
-				qt.update(e);
+				tree.updateEntityPosition(e);
 			}	
 			
 		} // end of for (e in entities)
@@ -348,10 +333,10 @@ class PhysicsTestScene extends Scene
 		
 		// draw the outer quad tree square
 		Draw.graphics.beginFill(0xCCCCCC, 0.3);
-		Draw.debug_drawAABB( qt, camera );
+		Draw.debug_drawAABB( tree.root, camera );
 		Draw.graphics.endFill();		
 
-		for (e in qt.iterator() ) {
+		for (e in tree.root.iterator() ) {
 			drawEntity( e );
 		}
 		
@@ -367,7 +352,7 @@ class PhysicsTestScene extends Scene
 		e.render( camera );
 		
 		if (showQuads) {
-			quad = qt.getItemsQuad( e );
+			quad = tree.getNode( e );
 			if (quad != null) {
 				Draw.graphics.lineStyle(1, 0x5566FF);
 				Draw.debug_drawAABB( quad, camera );
@@ -380,41 +365,19 @@ class PhysicsTestScene extends Scene
 		
 	}
 	
-	/*
-	 * Entity Manager functions
-	 */
-	
-	override public function add(e:Entity):Void 
-	{
-		_bounds = e.getBounds();
-		if (!qt.intersectsAabb( _bounds )) { return; }
-		_quad = qt.insert(e);
-		super.add(e);
-		eqh.set(e.id, _quad);
-	}
-	
-	override public function remove(e:Entity, ?free:Bool = true):Bool 
-	{
-		// remove all references to the item
-		qt.remove(e);
-		eqh.remove(e.id);
-		return super.remove(e, free);
-	}
-	
 	private var ev:Vec2;
 	private var ev2:Vec2;
 	private var dp:Float;
 	private var cdata:CollisionData;
 	private var playerBounds:AABB;
-	private var smallestQuad:QuadTree<Entity>;
+	private var smallestQuad:QuadNode;
 	private var quad:AABB;	
 	private var block:Block;
 	private var point:Point;
 	private var localX:Float;
-	private var localY:Float;	
-	private var cameraNode:QuadTree<Entity>;
+	private var localY:Float;
 	
 	private var _bounds:AABB;
-	private var _quad:QuadTree<Entity>;
+	private var _quad:QuadNode;
 	
 }

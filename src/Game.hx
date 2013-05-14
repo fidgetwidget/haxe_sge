@@ -39,10 +39,10 @@ class Game extends Engine {
 		super.init();
 		
 		_physicsScene = new PhysicsTestScene();
-		this.addScene(_physicsScene);
+		this.addScene(_physicsScene, true);
 		
 		_pongScene = new PongScene();
-		this.addScene(_pongScene, true);
+		this.addScene(_pongScene);
 		
 		_cameraScene = new CameraTestScene();
 		this.addScene(_cameraScene);
