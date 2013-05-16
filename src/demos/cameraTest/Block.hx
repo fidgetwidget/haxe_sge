@@ -9,7 +9,7 @@ import sge.core.Camera;
 import sge.core.Engine;
 import sge.core.Entity;
 import sge.graphics.Draw;
-import sge.random.Rand;
+import sge.random.Random;
 import sge.physics.AABB;
 import sge.physics.BoxCollider;
 import sge.physics.Motion;
@@ -30,14 +30,14 @@ class Block extends Entity
 	{
 		super();
 		className = Type.getClassName(demos.cameraTest.Block);
-		_box = new Box(0, 0, Rand.instance.between(4, 8), Rand.instance.between(4, 8));
+		_box = new Box(0, 0, Random.instance.between(4, 8), Random.instance.between(4, 8));
 		_boxCollider = new BoxCollider( _box, this );
 		collider = _boxCollider;
 		_visible = true;
 		_active = true;
-		_m = new Motion( Rand.instance.between( -20, 20), Rand.instance.between( -20, 20) );
+		_m = new Motion( Random.instance.between( -20, 20), Random.instance.between( -20, 20) );
 		_m.vf = 0.03;
-		transform.z = Rand.instance.between( -0.25, 0.25 );
+		transform.z = Random.instance.between( -0.25, 0.25 );
 		color = 0xFF2233;
 		state = Entity.DYNAMIC;
 		_shape = new Shape();
@@ -83,14 +83,14 @@ class Block extends Entity
 		var block:Block = Engine.getEntity( Block );
 		block.x = x;
 		block.y = y;
-		block.motion.vx = Rand.instance.between( -20, 20 );
-		block.motion.vy = Rand.instance.between( -20, 20 );
+		block.motion.vx = Random.instance.between( -20, 20 );
+		block.motion.vy = Random.instance.between( -20, 20 );
 		block.motion.vf = 0.03;
 		if (fixedZ) {
 			block.transform.z = 0;
 		} 
 		else {
-			block.transform.z = Rand.instance.between( -0.25, 0.5 );
+			block.transform.z = Random.instance.between( -0.25, 0.5 );
 			if (block.transform.z == 0) {
 				
 			}

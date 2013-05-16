@@ -15,7 +15,7 @@ import sge.geom.Path;
 import sge.io.Input;
 import sge.physics.CircleCollider;
 import sge.physics.Motion;
-import sge.random.Rand;
+import sge.random.Random;
 
 /**
  * ...
@@ -38,7 +38,7 @@ class Player extends Entity
 	public function new() 
 	{
 		super();
-		className = Type.getClassName(Player);	
+		className = Type.getClassName(demos.physicsTest.Player);	
 		_circle = new Circle(0, 0, radius);
 		_circleCollider = new CircleCollider(_circle, this);
 		collider = _circleCollider;
@@ -76,8 +76,7 @@ class Player extends Entity
 	}
 	
 	override private function _update( delta:Float ):Void 
-	{
-		
+	{		
 		_l = motion.vx * motion.vx + motion.vy * motion.vy;
 		if (_l > _m2) {
 			_l = Math.sqrt(_l);

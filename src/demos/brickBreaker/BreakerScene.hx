@@ -14,8 +14,8 @@ import sge.io.Input;
 import sge.physics.AABB;
 import sge.physics.CircleCollider;
 import sge.physics.CollisionData;
-import sge.physics.Physics;
-import sge.random.Rand;
+import sge.physics.CollisionMath;
+import sge.random.Random;
 
 /**
  * ...
@@ -63,7 +63,7 @@ class BreakerScene extends Scene
 		brickGrid = new Array<Array<Brick>>();
 		player = new Paddle();
 		ball = new Ball();
-		cdata = Physics.getCollisionData();
+		cdata = CollisionMath.getCollisionData();
 		mc = atlas.makeLayer(0);
 		
 		WIDTH = cast(Engine.properties.get("_STAGE_WIDTH"), Int);
@@ -248,7 +248,7 @@ class BreakerScene extends Scene
 		ball.x = WIDTH * 0.5;
 		ball.y = HEIGHT * 0.5 + 64;
 		ball.motion.vy = 1;
-		ball.motion.vx = Rand.instance.between( -1, 1);
+		ball.motion.vx = Random.instance.between( -1, 1);
 		ball.motion.v.normalize();
 		ball.motion.v.scale(100);
 	}

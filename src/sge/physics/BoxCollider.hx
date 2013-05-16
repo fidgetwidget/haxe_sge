@@ -23,6 +23,7 @@ class BoxCollider extends Collider
 	public var yOffset(get_yOffset, set_yOffset):Float;
 	public var width(get_width, set_width):Float;
 	public var height(get_height, set_height):Float;
+	public var useCenterPosition(default, default):Bool = true;
 	
 	/*
 	 * Members
@@ -55,27 +56,27 @@ class BoxCollider extends Collider
 	
 	public override function collidePoint( x:Float, y:Float, cdata:CollisionData = null ) :Bool {
 		
-		return Physics.boxPointCollision( getBounds(), x, y, cdata );
+		return CollisionMath.boxPointCollision( getBounds(), x, y, cdata );
 	}
 	
 	public override function collideLine( x1:Float, y1:Float, x2:Float, y2:Float, cdata:CollisionData = null ) :Bool {
 		
-		return Physics.boxLineCollision( getBounds(), x1, y1, x2, y2, cdata );
+		return CollisionMath.boxLineCollision( getBounds(), x1, y1, x2, y2, cdata );
 	}
 	
 	public override function collideAABB( target:AABB, cdata:CollisionData = null ) :Bool {
 		
-		return Physics.boxBoxCollision( getBounds(), target, cdata );
+		return CollisionMath.boxBoxCollision( getBounds(), target, cdata );
 	}
 	
 	public override function collideBox( b:BoxCollider, cdata:CollisionData = null ) :Bool {
 
-		return Physics.boxBoxCollision( getBounds(), b.getBounds(), cdata );
+		return CollisionMath.boxBoxCollision( getBounds(), b.getBounds(), cdata );
 	}
 	
 	public override function collideCircle( c:CircleCollider, cdata:CollisionData = null ) :Bool {
 		
-		return Physics.boxCircleCollision( getBounds(), c, cdata );
+		return CollisionMath.boxCircleCollision( getBounds(), c, cdata );
 	}
 	
 	
@@ -109,8 +110,13 @@ class BoxCollider extends Collider
 	
 	/* -- hasBounds -- */
 	public override function getBounds() :AABB {
-		_bounds.cx = x;
-		_bounds.cy = y;
+		if (useCenterPosition) {
+			_bounds.cx = x;
+			_bounds.cy = y;
+		} else {
+			_bounds.x = x;
+			_bounds.y = y;
+		}		
 		_bounds.width = _box.width;
 		_bounds.height = _box.height;
 		return _bounds;

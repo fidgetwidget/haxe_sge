@@ -56,26 +56,26 @@ class CircleCollider extends Collider
 	
 	public override function collidePoint( x:Float, y:Float, cdata:CollisionData = null ) :Bool {
 		
-		return Physics.circlePointCollision( this, x, y, cdata );
+		return CollisionMath.circlePointCollision( this, x, y, cdata );
 	}
 	
 	public override function collideLine( x1:Float, y1:Float, x2:Float, y2:Float, cdata:CollisionData = null ) :Bool {
 		
-		return Physics.circleLineCollision( this, x1, y1, x2, y2, cdata );
+		return CollisionMath.circleLineCollision( this, x1, y1, x2, y2, cdata );
 	}
 	
 	public override function collideAABB( target:AABB, cdata:CollisionData = null ) :Bool {
 		
-		return Physics.circleBoxCollision( this, target, cdata );
+		return CollisionMath.circleBoxCollision( this, target, cdata );
 	}
 	
 	public override function collideBox( b:BoxCollider, cdata:CollisionData = null ) :Bool {
-		return Physics.circleBoxCollision( this, b.getBounds(), cdata );
+		return CollisionMath.circleBoxCollision( this, b.getBounds(), cdata );
 	}
 	
 	public override function collideCircle( c:CircleCollider, cdata:CollisionData = null ) :Bool {
 		
-		return Physics.circleCircleCollision( this, c, cdata );
+		return CollisionMath.circleCircleCollision( this, c, cdata );
 	}
 	
 	// TODO: ----------------------
@@ -91,9 +91,9 @@ class CircleCollider extends Collider
 	public override function contains( x:Float, y:Float ) :Bool {
 		
 		if (_e != null) {
-			return Physics.distanceBetween_xy( _e.x + _circle.x, _e.y + _circle.y, x, y ) <= _circle.radius;
+			return CollisionMath.distanceBetween_xy( _e.x + _circle.x, _e.y + _circle.y, x, y ) <= _circle.radius;
 		} else {
-			return Physics.distanceBetween_xy( _circle.x, _circle.y, x, y ) <= _circle.radius;
+			return CollisionMath.distanceBetween_xy( _circle.x, _circle.y, x, y ) <= _circle.radius;
 		}		
 	}
 	

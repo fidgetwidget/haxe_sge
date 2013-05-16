@@ -1,4 +1,5 @@
 package sge.lib;
+import sge.geom.Vertices;
 
 /**
  * ...
@@ -12,12 +13,14 @@ class Region
 	 */
 	public var x(default, null):Int;
 	public var y(default, null):Int;
-	public var tiles:Array<Int>;
+	public var cells:Array<Int>;
 	public var world:World;
 	public var layer:Int;
 	public var isDirty(default, null):Bool = false;
-	public var isSaving(default, null):Bool = false;
+	public var isSaving(default, null):Bool = false;	
 	
+	private var _tileData(get_tileData, never):TileData;
+	private var _tileEdges:Vertices; // not yet used
 	
 	/**
 	 * Constructor
@@ -26,7 +29,7 @@ class Region
 	 */
 	public function new( x:Int, y:Int, layer:Int, world:World ) 
 	{
-		tiles = [];
+		cells = [];
 		this.x = x;
 		this.y = y;
 		this.layer = layer;
@@ -59,6 +62,8 @@ class Region
 	public function save() :Void {
 		isDirty = false;
 		isSaving = true;
+		// TODO: start writing the data to the file
+		// and when its done, set isSaving to false
 	}
 	
 	public function resetTiles() :Void {
@@ -76,14 +81,14 @@ class Region
 	// returns the fixed index of the row and column passed
 	public function setTile( r:Int, c:Int, tile:Int ) :Int {
 		var index = get_index(r, c);
-		tiles[index] = tile;
+		cells[index] = tile;
 		isDirty = true;
 		return index;
 	}
 	
 	public function getTile( r:Int, c:Int ) :Int {
 		var index = get_index(r, c);
-		return tiles[index];
+		return cells[index];
 	}
 	
 	/*
@@ -91,8 +96,8 @@ class Region
 	 */
 	public function setTileAt( x:Float, y:Float, tile:Int ) :Int {
 		if (check_bounds( x, y )) {
-			var r = Math.floor( (y - this.y) / World.tile_height);
-			var c = Math.floor( (x - this.x) / World.tile_width);
+			var r = Math.floor( (y - this.y) / World.cell_height);
+			var c = Math.floor( (x - this.x) / World.cell_width);
 			return setTile( r, c, tile );
 		}
 		return -1;
@@ -100,8 +105,8 @@ class Region
 	
 	public function getTileAt( x:Float, y:Float ) :Int {
 		if (check_bounds( x, y )) {
-			var r = Math.floor( (y - this.y) / World.tile_height);
-			var c = Math.floor( (x - this.x) / World.tile_width);
+			var r = Math.floor( (y - this.y) / World.cell_height);
+			var c = Math.floor( (x - this.x) / World.cell_width);
 			return getTile( r, c );
 		}
 		return -1;
@@ -119,6 +124,8 @@ class Region
 	
 	inline function get_index( r:Int, c:Int ) :Int 			{ return c + (r * World.region_rows); }
 	inline function get_index_at( x:Float, y:Float ) :Int 	{ return get_index( get_row(y), get_col(x) ); }
-	inline function get_row( y:Float ) :Int 				{ return Math.floor( y / World.tile_height ); }
-	inline function get_col( x:Float ) :Int 				{ return Math.floor( x / World.tile_width ); }
+	inline function get_row( y:Float ) :Int 				{ return Math.floor( y / World.cell_height ); }
+	inline function get_col( x:Float ) :Int 				{ return Math.floor( x / World.cell_width ); }
+	
+	inline function get_tileData() :TileData 				{ return world.tileData; }
 }

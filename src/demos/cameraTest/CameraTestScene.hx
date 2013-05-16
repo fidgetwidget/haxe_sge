@@ -22,8 +22,8 @@ import sge.graphics.Atlas;
 import sge.physics.AABB;
 import sge.physics.CollisionData;
 import sge.physics.Motion;
-import sge.physics.Physics;
-import sge.random.Rand;
+import sge.physics.CollisionMath;
+import sge.random.Random;
 
 #if (!js)
 import sge.core.Debug;
@@ -80,7 +80,7 @@ class CameraTestScene extends Scene
 		grid = new EntityGrid(GRID_WIDTH, GRID_HEIGHT);
 		entities = grid;
 		blocks = new Array<Block>();
-		cdata = Physics.getCollisionData();
+		cdata = CollisionMath.getCollisionData();
 		
 		targetType = Camera.TARGET_FIXED;
 		bg = atlas.makeLayer(0);
@@ -111,10 +111,10 @@ class CameraTestScene extends Scene
 		mg.addChild(player.mc);
 		
 		for (i in 0...BOX_COUNT) {
-			var block:Block = Block.makeBlock(Rand.instance.between(30, GRID_WIDTH - 30), Rand.instance.between(30, GRID_HEIGHT - 30));
+			var block:Block = Block.makeBlock(Random.instance.between(30, GRID_WIDTH - 30), Random.instance.between(30, GRID_HEIGHT - 30));
 			block.motion.vf = 0;
-			block.motion.vx = Rand.instance.between(-50, 50);
-			block.motion.vy = Rand.instance.between(-50, 50);
+			block.motion.vx = Random.instance.between(-50, 50);
+			block.motion.vy = Random.instance.between(-50, 50);
 			blocks.push( block );
 			add( block );
 			if (block.transform.z == 0) {
@@ -129,10 +129,10 @@ class CameraTestScene extends Scene
 			}
 		}
 		for (i in 0...12) {
-			var block:Block = Block.makeBlock(Rand.instance.between(0, GRID_WIDTH), Rand.instance.between(0, GRID_HEIGHT), true);
+			var block:Block = Block.makeBlock(Random.instance.between(0, GRID_WIDTH), Random.instance.between(0, GRID_HEIGHT), true);
 			block.motion.vf = 0;
-			block.motion.vx = Rand.instance.between(-50, 50);
-			block.motion.vy = Rand.instance.between( -50, 50);
+			block.motion.vx = Random.instance.between(-50, 50);
+			block.motion.vy = Random.instance.between( -50, 50);
 			blocks.push( block );
 			add( block );
 			mg.addChild(block.mc);
@@ -240,7 +240,7 @@ class CameraTestScene extends Scene
 				}
 				else {
 					var p = new Point( localX, localY );
-					var distance:Float = Physics.distanceBetween_xy(point.x, point.y, p.x, p.y);
+					var distance:Float = CollisionMath.distanceBetween_xy(point.x, point.y, p.x, p.y);
 					if (distance >= player.radius) {
 						player.addPathPoint( p );
 					}

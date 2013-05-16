@@ -19,7 +19,7 @@ import sge.graphics.AssetManager;
 import sge.graphics.Draw;
 import sge.io.Input;
 import sge.lib.Properties;
-import sge.random.Rand;
+import sge.random.Random;
 
 
 /**
@@ -92,7 +92,7 @@ class Engine
 		Draw.init( _graphics );
 		EntityFactory.init();
 		AssetManager.init();
-		Rand.init( Std.int(_start) );
+		Random.init( Std.int(_start) );
 		Actuate.reset(); // not nessesary, but just here to remind that you have access to Actuate
 		
 		#if (!js)

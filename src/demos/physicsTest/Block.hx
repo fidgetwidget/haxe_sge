@@ -12,7 +12,7 @@ import sge.graphics.Draw;
 import sge.physics.AABB;
 import sge.physics.BoxCollider;
 import sge.physics.Motion;
-import sge.random.Rand;
+import sge.random.Random;
 
 
 /**
@@ -31,7 +31,7 @@ class Block extends Entity
 	{
 		super();
 		className = Type.getClassName(Block);
-		_box = new Box(0, 0, Rand.instance.between(10,20), Rand.instance.between(10,20));
+		_box = new Box(0, 0, Random.instance.between(10,20), Random.instance.between(10,20));
 		_boxCollider = new BoxCollider( _box, this);
 		_boxCollider.xOffset = _boxCollider.width * 0.5;
 		_boxCollider.yOffset = _boxCollider.height * 0.5;
@@ -98,8 +98,8 @@ class Block extends Entity
 		if (_m == null) {
 			_m = new Motion();
 		}
-		_m.vx = Rand.instance.between( -20, 20);
-		_m.vy = Rand.instance.between( -20, 20);
+		_m.vx = Random.instance.between( -20, 20);
+		_m.vy = Random.instance.between( -20, 20);
 		_m.vf = 0.005;
 		_m.vr = 0;
 		_m.fr = 0;

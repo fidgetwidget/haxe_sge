@@ -13,8 +13,8 @@ import sge.graphics.Draw;
 import sge.io.Input;
 import sge.physics.AABB;
 import sge.physics.CollisionData;
-import sge.physics.Physics;
-import sge.random.Rand;
+import sge.physics.CollisionMath;
+import sge.random.Random;
 
 /**
  * ...
@@ -70,7 +70,7 @@ class PongScene extends Scene
 	{
 		super.ready();		
 		
-		cdata = Physics.getCollisionData();
+		cdata = CollisionMath.getCollisionData();
 		camera.width = 800;
 		camera.height = 600;
 		camera.x = 0;
@@ -227,8 +227,8 @@ class PongScene extends Scene
 		ball.y = screenBounds.center.y;
 		ball.motion.vf = 0;
 		
-		ball.motion.v.x = Rand.instance.between( -100, 100);
-		ball.motion.v.y = Rand.instance.between( -100, 100);
+		ball.motion.v.x = Random.instance.between( -100, 100);
+		ball.motion.v.y = Random.instance.between( -100, 100);
 		ball.motion.v.normalize();
 		ball.motion.v.scale( 128);
 		

@@ -16,12 +16,12 @@ import sge.graphics.Atlas;
 import sge.core.Camera;
 import sge.core.Entity;
 import sge.core.Scene;
-import sge.random.Rand;
+import sge.random.Random;
 import sge.geom.Path;
 import sge.physics.AABB;
 import sge.physics.CircleCollider;
 import sge.physics.CollisionData;
-import sge.physics.Physics;
+import sge.physics.CollisionMath;
 import sge.physics.Vec2;
 import sge.geom.SplineSegment;
 import sge.core.Engine;
@@ -146,7 +146,7 @@ class PhysicsTestScene extends Scene
 				}
 				else {
 					var p = new Point( localX, localY );
-					var distance:Float = Physics.distanceBetween_points(point, p);
+					var distance:Float = CollisionMath.distanceBetween_points(point, p);
 					if (distance >= player.radius) {
 						player.addPathPoint( p );
 					}
@@ -160,7 +160,7 @@ class PhysicsTestScene extends Scene
 					path.add_Point( Input.getMousePoint().clone() );
 				}
 				else {
-					var distance:Float = Physics.distanceBetween_points(point, Input.getMousePoint());
+					var distance:Float = CollisionMath.distanceBetween_points(point, Input.getMousePoint());
 					if (distance >= 16) {
 						path.add_Point( Input.getMousePoint().clone() );
 					}
@@ -240,7 +240,7 @@ class PhysicsTestScene extends Scene
 			
 			e.update( delta );
 			
-			cdata = Physics.getCollisionData();
+			cdata = CollisionMath.getCollisionData();
 			_bounds = e.getBounds();
 			
 			if (e.className == Type.getClassName(Player)) {

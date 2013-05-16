@@ -13,9 +13,9 @@ import sge.core.Engine;
 import sge.graphics.Draw;
 import sge.io.Input;
 import sge.geom.Path;
-import sge.random.Rand;
+import sge.random.Random;
 import sge.physics.CircleCollider;
-import sge.physics.Physics;
+import sge.physics.CollisionMath;
 import sge.physics.Motion;
 
 /**

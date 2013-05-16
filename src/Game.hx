@@ -11,7 +11,7 @@ import demos.pong.PongScene;
 
 import sge.core.Engine;
 import sge.io.Input;
-import sge.random.Rand;
+import sge.random.Random;
 
 
 /**
@@ -39,7 +39,7 @@ class Game extends Engine {
 		super.init();
 		
 		_physicsScene = new PhysicsTestScene();
-		this.addScene(_physicsScene, true);
+		this.addScene(_physicsScene);
 		
 		_pongScene = new PongScene();
 		this.addScene(_pongScene);
@@ -51,7 +51,7 @@ class Game extends Engine {
 		this.addScene(_brickBreakerScene);
 		
 		_platformerScene = new PlatformScene();
-		this.addScene(_platformerScene);
+		this.addScene(_platformerScene, true);
 		
 	}
 	

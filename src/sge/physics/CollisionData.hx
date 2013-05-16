@@ -49,13 +49,15 @@ class CollisionData
 	}
 	
 	/// Returns the collisions parent (or return null if there isn't one)
-	public function getPrev() :CollisionData
-	{
-		return prev;
-	}
+	public function getPrev() :CollisionData 	{ return prev; }	
+	public function hasNext() :Bool 			{ return next != null; }	
+	public function getNext() :CollisionData 	{ return next; }
 	
 	/// Add another collision set, return it.
-	public function setNext( cdata:CollisionData ) :CollisionData {
+	public function setNext( cdata:CollisionData = null ) :CollisionData {
+		if (cdata == null) {
+			cdata = CollisionMath.getCollisionData();
+		}
 		this.next = cdata;
 		cdata.prev = this;
 		return cdata;

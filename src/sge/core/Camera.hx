@@ -9,7 +9,7 @@ import nme.geom.Point;
 import sge.physics.Vec2;
 import sge.physics.Motion;
 import sge.physics.AABB;
-import sge.physics.Physics;
+import sge.physics.CollisionMath;
 
 /**
  * ...
@@ -125,7 +125,7 @@ class Camera
 		
 		if (targetType == TARGET_GOTO) {
 			_target = null;
-			moveTo(target.x, target.y, Physics.distanceBetween_xy(center.x, center.y, target.x, target.y), easeType );
+			moveTo(target.x, target.y, CollisionMath.distanceBetween_xy(center.x, center.y, target.x, target.y), easeType );
 			return;
 		}
 		
