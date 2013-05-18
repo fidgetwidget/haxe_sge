@@ -341,11 +341,11 @@ class CollisionMath
 	 cdata:CollisionData = null ) :Bool 
 	{
 		
-		var dx = b1.x - b2.x;
+		var dx = b1.center.x - b2.center.x;
 		var px = (b1.hWidth + b2.hWidth) - Math.abs(dx);
 		if (px > 0) {
 			
-			var dy = b1.y - b2.y;
+			var dy = b1.center.y - b2.center.y;
 			var py = (b1.hHeight + b2.hHeight) - Math.abs(dy);
 			if (py > 0) {
 				
@@ -411,10 +411,10 @@ class CollisionMath
 		
 		var dx = box.cx - pointX;
 		var px = box.hWidth - Math.abs(dx);
-		if (px > 0) {
+		if (px >= 0) {
 			var dy = box.cy - pointY;
 			var py = box.hHeight - Math.abs(dy);
-			if (py > 0) {
+			if (py >= 0) {
 				
 				 // we don't have to check if cdata is null, we already did that
 				cdata.intersects = true;
@@ -581,7 +581,6 @@ class CollisionMath
 	/**
 	 * Factory Methods
 	 */
-	
 	public static function getCollisionData() :CollisionData 
 	{
 		if (_cdatas == null) {
@@ -597,10 +596,18 @@ class CollisionMath
 	public static function freeCollisionData( cdata:CollisionData ) :Void 
 	{
 		if (_cdatas == null) {
-			_cdatas = new FastList<CollisionData>();			
+			_cdatas = new FastList<CollisionData>();
 		}
-		cdata.free();
+		// start at the first
+		CollisionData.getFirst( cdata );
+		// add all of them to the pool
 		_cdatas.add(cdata);
+		while ( cdata.hasNext() ) {
+			cdata = cdata.getNext();
+			_cdatas.add( cdata );
+		}
+		// free all of them
+		cdata.free();
 	}
 	
 	/**

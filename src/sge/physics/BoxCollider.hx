@@ -24,6 +24,7 @@ class BoxCollider extends Collider
 	public var width(get_width, set_width):Float;
 	public var height(get_height, set_height):Float;
 	public var useCenterPosition(default, default):Bool = true;
+	public var useBottomCenterPosition(default, default):Bool = false;
 	
 	/*
 	 * Members

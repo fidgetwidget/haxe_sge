@@ -33,37 +33,37 @@ import sge.core.Debug;
 class PlatformScene extends Scene
 {	
 
-	static inline var WIDTH:Int = 16384;
-	static inline var HEIGHT:Int = 16384;
+	static inline var WIDTH:Int = 4096;
+	static inline var HEIGHT:Int = 4096;
 	
+	/*
+	 * Members
+	 */	
 	private var localX:Float;
 	private var localY:Float;
-	
+	private var cdata:CollisionData;	
 	private var mouseDrag:Bool = false;
 	private var dragX:Float;
 	private var dragY:Float;
 	
 	private var grid:EntityGrid;
 	private var world:World;
-	private var worldBounds:AABB;
-	private var cdata:CollisionData;
-	
+	private var _currTileType:Int = 1;
 	private var mc:Sprite;
 	
 	private var player:Player;
-	private var aabb:AABB;	
-	private var _currTileType:Int = 1;
 	private var _playerPaused:Bool = true;
+	
 	
 	public function new() 
 	{		
-		var rows:Int = Math.floor( HEIGHT / World.cell_height );
-		var cols:Int = Math.floor( WIDTH / World.cell_width  );
 		
 		super();
 		atlas = new Atlas();
 		id = "PlatformScene";
 		
+		var rows:Int = Math.floor( HEIGHT / World.cell_height );
+		var cols:Int = Math.floor( WIDTH / World.cell_width  );
 		camera = new Camera();
 		world = new World(rows, cols);
 		player = new Player();
@@ -74,34 +74,29 @@ class PlatformScene extends Scene
 		var tileData = new TileData();
 		world.loadAssets(tileData);
 		
-		var stage = Engine.root.stage;
-		var centerX:Float = WIDTH * 0.5;
-		var centerY:Float = HEIGHT * 0.5;
-		
 		camera.width = cast(Engine.properties.get("_STAGE_WIDTH"), Int);
 		camera.height = cast(Engine.properties.get("_STAGE_HEIGHT"), Int);
 		camera.x = 0;
 		camera.y = 0;
 		camera.sceneBounds.width = WIDTH + camera.width;
 		camera.sceneBounds.height = HEIGHT + camera.height;
-		camera.sceneBounds.cx = centerX;
-		camera.sceneBounds.cy = centerY;
+		camera.sceneBounds.cx = WIDTH * 0.5;
+		camera.sceneBounds.cy = HEIGHT * 0.5;
 		camera.motion = new Motion();
 		camera.motion.vf = 3.8;
 		
 		player.x = 100;
 		player.y = 100;
+		player.world = world;
 		add(player);
 		mc.addChild(player.mc);
-		
-		cdata = CollisionMath.getCollisionData();
 		
 #if (!js) 
 		Debug.registerVariable(camera, "x", "cam_x", true);
 		Debug.registerVariable(camera, "y", "cam_y", true);
 		
-		Debug.registerVariable(cdata, "px", "collider_px", true);
-		Debug.registerVariable(cdata, "py", "collider_py", true);
+		Debug.registerVariable(player, "x", "player_x", true);
+		Debug.registerVariable(player, "y", "player_y", true);
  
 		Debug.registerFunction(this, "getRow", "row", true);
 		Debug.registerFunction(this, "getCol", "col", true);
@@ -182,34 +177,17 @@ class PlatformScene extends Scene
 	
 	override private function _update(delta:Float):Void 
 	{
+		cdata = CollisionMath.getCollisionData();
 		camera.update(delta);
 		
-		if (!_playerPaused) {	
-			
-			aabb = player.getBounds();
-			
-			if ( world.collidePoint(aabb.center.x, aabb.bottom, 0, cdata) ) {
-				player.motion.vy = 0;
-				player.y -= cdata.py;
-				player.falling = false;
-			} else
-			if ( world.collidePoint(aabb.center.x, aabb.top, 0, cdata) ) {
-				player.motion.vy = 0;
-				player.y += cdata.py;
-				player.jumping = false;
-				player.falling = true;
-			}
-			
-			/// TODO: create a way to test one side at a time, and use that instead
-			if ( world.collideAabb(aabb, 0, cdata) ) {
-				if (cdata.px < cdata.py) {
-					player.motion.vx = 0;
-					player.x -= cdata.px * cdata.oH;
-				}
-			}
+		if (!_playerPaused) {
 			
 			player.update(delta);
+			//player.doWorldCollisions(world, cdata);		
+			
 		}
+		
+		CollisionMath.freeCollisionData(cdata);
 	}
 	
 	

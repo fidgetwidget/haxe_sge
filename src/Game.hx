@@ -22,12 +22,12 @@ import sge.random.Random;
 
 class Game extends Engine { 
 	
-	private var _physicsScene:PhysicsTestScene;
-	private var _cameraScene:CameraTestScene;
-	
+	//private var _physicsScene:PhysicsTestScene;
+	//private var _cameraScene:CameraTestScene;
+	//
 	private var _platformerScene:PlatformScene;
-	private var _pongScene:PongScene;
-	private var _brickBreakerScene:BreakerScene;
+	//private var _pongScene:PongScene;
+	//private var _brickBreakerScene:BreakerScene;
 	
 	public function new(root) {	
 		
@@ -38,17 +38,17 @@ class Game extends Engine {
 		
 		super.init();
 		
-		_physicsScene = new PhysicsTestScene();
-		this.addScene(_physicsScene);
-		
-		_pongScene = new PongScene();
-		this.addScene(_pongScene);
-		
-		_cameraScene = new CameraTestScene();
-		this.addScene(_cameraScene);
-		
-		_brickBreakerScene = new BreakerScene();
-		this.addScene(_brickBreakerScene);
+		//_physicsScene = new PhysicsTestScene();
+		//this.addScene(_physicsScene);
+		//
+		//_pongScene = new PongScene();
+		//this.addScene(_pongScene);
+		//
+		//_cameraScene = new CameraTestScene();
+		//this.addScene(_cameraScene);
+		//
+		//_brickBreakerScene = new BreakerScene();
+		//this.addScene(_brickBreakerScene);
 		
 		_platformerScene = new PlatformScene();
 		this.addScene(_platformerScene, true);
@@ -59,25 +59,25 @@ class Game extends Engine {
 	override private function _preUpdate():Void 
 	{
 		
-		if ( Input.isKeyDown(Keyboard.CONTROL) ) {
-			
-			if (Input.isKeyDown(Keyboard.G) ) {
-				this.readyScene( _physicsScene.id );
-			}
-			if (Input.isKeyDown(Keyboard.I) ) {
-				this.readyScene( _pongScene.id );
-			}
-			if (Input.isKeyDown(Keyboard.J) ) {
-				this.readyScene( _cameraScene.id );
-			}
-			if (Input.isKeyDown(Keyboard.K) ) {
-				this.readyScene( _platformerScene.id );
-			}			
-			if (Input.isKeyDown(Keyboard.L) ) {
-				this.readyScene( _brickBreakerScene.id );
-			}
-			
-		}
+		//if ( Input.isKeyDown(Keyboard.CONTROL) ) {
+			//
+			//if (Input.isKeyDown(Keyboard.G) ) {
+				//this.readyScene( _physicsScene.id );
+			//}
+			//if (Input.isKeyDown(Keyboard.I) ) {
+				//this.readyScene( _pongScene.id );
+			//}
+			//if (Input.isKeyDown(Keyboard.J) ) {
+				//this.readyScene( _cameraScene.id );
+			//}
+			//if (Input.isKeyDown(Keyboard.K) ) {
+				//this.readyScene( _platformerScene.id );
+			//}			
+			//if (Input.isKeyDown(Keyboard.L) ) {
+				//this.readyScene( _brickBreakerScene.id );
+			//}
+			//
+		//}
 		
 		
 		super._preUpdate();

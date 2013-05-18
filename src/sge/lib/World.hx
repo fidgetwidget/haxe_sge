@@ -266,21 +266,21 @@ class World
 			rr += region_rows;
 		}
 		
-		//Draw.graphics.lineStyle(0.5, 0x0000FF);
-		//var collider:Collider;
-		//rr = _r;
-		//cc = _c;
-		//while (rr <= _m_r) {
-			//while (cc <= _m_c) {
-				//if (getTile(rr, cc, 0) != 0) {
-					//collider = tileData.getCollider(1, cc * cell_width, rr * cell_height);
-					//Draw.debug_drawAABB(collider.getBounds(), camera);
-				//}
-				//cc++;
-			//}
-			//cc = _c_start;
-			//rr++;
-		//}
+		Draw.graphics.lineStyle(0.5, 0x0000FF);
+		var collider:Collider;
+		rr = _r;
+		cc = _c;
+		while (rr <= _m_r) {
+			while (cc <= _m_c) {
+				if (getTile(rr, cc, 0) != 0) {
+					collider = tileData.getCollider(1, cc * cell_width, rr * cell_height);
+					Draw.debug_drawAABB(collider.getBounds(), camera);
+				}
+				cc++;
+			}
+			cc = _c_start;
+			rr++;
+		}
 		Draw.graphics.lineStyle(0, 0, 0);
 		
 	}
@@ -319,8 +319,8 @@ class World
 		
 		var collides:Bool = false;
 		
-		_r = get_row( aabb.top );
-		_c = get_col( aabb.left );
+		_r = get_row( aabb.top ) - 1;
+		_c = get_col( aabb.left ) - 1;
 		_m_r = get_row( aabb.bottom ) + 1;
 		_m_c = get_col( aabb.right ) + 1;
 		if (_r < 0) { _r = 0; }
@@ -345,7 +345,7 @@ class World
 			rr++;
 		}
 		if (cdata != null) {
-			cdata = cdata.getFirst();
+			CollisionData.getFirst(cdata);
 		}
 		return collides;
 	}
