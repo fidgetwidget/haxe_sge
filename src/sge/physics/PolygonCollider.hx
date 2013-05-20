@@ -6,7 +6,9 @@ import sge.geom.Polygon;
 import sge.geom.Vertices;
 
 /**
- * ...
+ * ***INCOMPLETE*** * 
+ * Polygon Collider
+ * 
  * @author fidgetwidget
  */
 
@@ -25,8 +27,8 @@ class PolygonCollider extends Collider
 	public var yOffset(get_yOffset, set_yOffset):Float;
 	
 	public var polygon(get_polygon, set_polygon):Polygon;
-	public var vertices(get_vertices, never):Vertices;
-	public var transformed(get_transformed, never):Vertices;
+	public var vertices(get_vertices, never):Vertices; // the untransformed vertices
+	public var transformed(get_transformed, never):Vertices; // the transformed vertices
 	
 	/*
 	 * Members
@@ -78,6 +80,7 @@ class PolygonCollider extends Collider
 		return result;
 	}
 	
+	// TODO: ----------------------
 	public override function contains( x:Float, y:Float ) :Bool {
 		
 		return false;
@@ -99,7 +102,7 @@ class PolygonCollider extends Collider
 	}
 	
 	public override function collideBox( b:BoxCollider, cdata:CollisionData = null ) :Bool {
-		// TODO: boxBoxCollision shouldn't be an AA collision check
+		
 		return false;
 	}
 	
@@ -108,8 +111,9 @@ class PolygonCollider extends Collider
 		return false;
 	}
 	
-	// TODO: ----------------------
+	
 	public override function collidePoly( p:PolygonCollider, cdata:CollisionData = null) :Bool { 
+		
 		return false;
 	}
 	// ----------------------------
@@ -134,8 +138,6 @@ class PolygonCollider extends Collider
 	private function set_xOffset	( x:Float )	:Float { return _polygon.x = x; }
 	private function set_yOffset	( y:Float )	:Float { return _polygon.y = y; }
 	private function set_polygon	( p:Polygon ) :Polygon { return _polygon = p; }
-	
-	
 	
 	
 	/* -- hasBounds -- */

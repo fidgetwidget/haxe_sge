@@ -17,17 +17,22 @@ import sge.random.Random;
 /**
  * Game
  * - Do any front loading stuff here
+ * 
+ * This is an example of how you might create a game, by making your own
+ * Engine extension, and using it to pre-load any of the games content.
+ * In the Main.hx, you would set Engine.instance to an instance of this custom
+ * Class instead.
+ * 
  * @author fidgetwidget
  */
 
 class Game extends Engine { 
 	
-	//private var _physicsScene:PhysicsTestScene;
-	//private var _cameraScene:CameraTestScene;
-	//
+	private var _physicsScene:PhysicsTestScene;
+	private var _cameraScene:CameraTestScene;	
 	private var _platformerScene:PlatformScene;
-	//private var _pongScene:PongScene;
-	//private var _brickBreakerScene:BreakerScene;
+	private var _pongScene:PongScene;
+	private var _brickBreakerScene:BreakerScene;
 	
 	public function new(root) {	
 		
@@ -38,17 +43,17 @@ class Game extends Engine {
 		
 		super.init();
 		
-		//_physicsScene = new PhysicsTestScene();
-		//this.addScene(_physicsScene);
-		//
-		//_pongScene = new PongScene();
-		//this.addScene(_pongScene);
-		//
-		//_cameraScene = new CameraTestScene();
-		//this.addScene(_cameraScene);
-		//
-		//_brickBreakerScene = new BreakerScene();
-		//this.addScene(_brickBreakerScene);
+		_physicsScene = new PhysicsTestScene();
+		this.addScene(_physicsScene);
+		
+		_pongScene = new PongScene();
+		this.addScene(_pongScene);
+		
+		_cameraScene = new CameraTestScene();
+		this.addScene(_cameraScene);
+		
+		_brickBreakerScene = new BreakerScene();
+		this.addScene(_brickBreakerScene);
 		
 		_platformerScene = new PlatformScene();
 		this.addScene(_platformerScene, true);
@@ -80,7 +85,7 @@ class Game extends Engine {
 		//}
 		
 		
-		super._preUpdate();
+		super._preUpdate(); // right now nothing happens in the parent... but it might eventually.
 	}
 	
 }

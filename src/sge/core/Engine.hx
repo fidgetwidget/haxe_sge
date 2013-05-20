@@ -96,6 +96,7 @@ class Engine
 		Actuate.reset(); // not nessesary, but just here to remind that you have access to Actuate
 		
 		#if (!js)
+		/// the pgr.gconsole.GameConsole doesn't work in html5 targets - will need to replace this eventually...
 		Debug.init();		
 		Debug.registerVariable(this, "_sceneNames", "all_scenese");
 		Debug.registerFunction(this, "readyScene", "readyScene");

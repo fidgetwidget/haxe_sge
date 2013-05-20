@@ -3,23 +3,23 @@ package demos.platformer;
 import nme.geom.Point;
 import nme.ui.Keyboard;
 import nme.display.Sprite;
-import sge.lib.TileData;
+
 
 import sge.core.EntityGrid;
-import sge.graphics.Atlas;
-
 import sge.core.Camera;
 import sge.core.Engine;
 import sge.core.Scene;
 import sge.core.Entity;
+import sge.graphics.Atlas;
 import sge.graphics.Draw;
 import sge.io.Input;
-import sge.lib.World;
 import sge.physics.AABB;
 import sge.physics.CollisionData;
 import sge.physics.CollisionMath;
 import sge.physics.Motion;
 import sge.random.Random;
+import sge.world.World;
+import sge.world.TileData;
 
 #if (!js) 
 import sge.core.Debug;
@@ -74,8 +74,8 @@ class PlatformScene extends Scene
 		var tileData = new TileData();
 		world.loadAssets(tileData);
 		
-		camera.width = cast(Engine.properties.get("_STAGE_WIDTH"), Int);
-		camera.height = cast(Engine.properties.get("_STAGE_HEIGHT"), Int);
+		camera.width = cast(Engine.properties.getValue("_STAGE_WIDTH"), Int);
+		camera.height = cast(Engine.properties.getValue("_STAGE_HEIGHT"), Int);
 		camera.x = 0;
 		camera.y = 0;
 		camera.sceneBounds.width = WIDTH + camera.width;
@@ -97,6 +97,8 @@ class PlatformScene extends Scene
 		
 		Debug.registerVariable(player, "x", "player_x", true);
 		Debug.registerVariable(player, "y", "player_y", true);
+		Debug.registerVariable(player.motion, "vx", "player_mx", true);
+		Debug.registerVariable(player.motion, "vy", "player_my", true);
  
 		Debug.registerFunction(this, "getRow", "row", true);
 		Debug.registerFunction(this, "getCol", "col", true);

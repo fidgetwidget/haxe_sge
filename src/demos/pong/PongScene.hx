@@ -48,8 +48,8 @@ class PongScene extends Scene
 		atlas = new Atlas();
 		id = "PongScene";
 		
-		WIDTH = cast(Engine.properties.get("_STAGE_WIDTH"), Int);
-		HEIGHT = cast(Engine.properties.get("_STAGE_HEIGHT"), Int);
+		WIDTH = cast(Engine.properties.getValue("_STAGE_WIDTH"), Int);
+		HEIGHT = cast(Engine.properties.getValue("_STAGE_HEIGHT"), Int);
 		
 		paddle1 = new Paddle();
 		paddle2 = new Paddle();

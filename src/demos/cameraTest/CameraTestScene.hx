@@ -91,8 +91,8 @@ class CameraTestScene extends Scene
 		var centerX:Float = GRID_WIDTH * 0.5;
 		var centerY:Float = GRID_HEIGHT * 0.5;
 		
-		camera.width = cast(Engine.properties.get("_STAGE_WIDTH"), Int);
-		camera.height = cast(Engine.properties.get("_STAGE_HEIGHT"), Int);
+		camera.width = cast(Engine.properties.getValue("_STAGE_WIDTH"), Int);
+		camera.height = cast(Engine.properties.getValue("_STAGE_HEIGHT"), Int);
 		
 		camera.sceneBounds.width = GRID_WIDTH + camera.width;
 		camera.sceneBounds.height = GRID_HEIGHT + camera.height;

@@ -175,8 +175,6 @@ class Entity implements IHasBounds, implements IHasId, implements IRecyclable
 	
 	
 	/// IRecyclable
-	// NOTES: I am not sure if the "free" boolean is really needed (and the isFree test) beyond testing and debugging the factories
-	// so I may change it once I have factories for all of the things I think I will need...
 	public function free() :Void 
 	{
 		_t.free();	
@@ -185,14 +183,8 @@ class Entity implements IHasBounds, implements IHasId, implements IRecyclable
 		}
 		_free = true;
 	}
-	public function isFree() :Bool 
-	{
-		return _free;
-	}
-	public function use() :Void 
-	{
-		_free = false;
-	}
+	public function get_free() :Bool 			{ return _free; }
+	public function set_free( free:Bool ) :Bool { return _free = free; }
 	private var _free:Bool;
 	
 	//** IHasBounds

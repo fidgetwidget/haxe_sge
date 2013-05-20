@@ -26,11 +26,18 @@ class Properties
 		nameValHash.set(name, value);
 	}
 	
-	public function get( name:String ) :Dynamic {
+	public function getValue( name:String ) :Dynamic {
 		if (hasValue(name)) {
 			return nameValHash.get(name);
 		}
 		return null;
+	}
+	
+	public function getPair( name:String ) :NameValuePair {
+		if (hasValue(name)) {
+			return { name:name, value:nameValHash.get(name) };
+		}
+		return { name:"", value:null };
 	}
 	
 	public function hasValue( name:String ) :Bool {

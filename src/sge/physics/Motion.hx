@@ -3,18 +3,18 @@ import sge.interfaces.IRecyclable;
 
 
 /**
- * ...
+ * Motion
+ * (a class for sharing motion data between objects)
+ * has acceleration, velocity, and friction values for position and rotation
+ * 
  * @author fidgetwidget
  */
 
 typedef MotionData = {	
-	var ax:Float;
-	var ay:Float;
-	var vx:Float;
-	var vy:Float;
-	var vf:Float;
-	var vr:Float;
-	var fr:Float;
+	ax:Float, ay:Float, ar:Float, 	// position and rotation acceleration
+	vx:Float, vy:Float, vf:Float, 	// position velocity and friction
+	vr:Float, fr:Float, 			// rotation velocity and friction
+	max_v:Float, max_r:Float
 }
  
 class Motion implements IRecyclable
@@ -53,7 +53,7 @@ class Motion implements IRecyclable
 	 */
 	private var _a	:Vec2;
 	private var _v	:Vec2;
-	private var _fv	:Vec2;
+	private var _vf	:Vec2;
 	
 	 
 	/**
@@ -64,7 +64,7 @@ class Motion implements IRecyclable
 		_a = new Vec2();
 		ar = 0;
 		_v = new Vec2();		
-		_fv = new Vec2();
+		_vf = new Vec2();
 		set( vx, vy, fx, fy, vr, fr );
 	}
 	
@@ -141,9 +141,9 @@ class Motion implements IRecyclable
 			_v.y += _a.y * delta;
 		}
 		else 
-		if (_fv.x != 0 || _fv.y != 0) {
-			_v.x -= _v.x * _fv.x;
-			_v.y -= _v.y * _fv.y;
+		if (_vf.x != 0 || _vf.y != 0) {
+			_v.x -= _v.x * _vf.x;
+			_v.y -= _v.y * _vf.y;
 		}		
 		if (_v.x < 1 && _v.x > -1) { _v.x = 0; }
 		if (_v.y < 1 && _v.y > -1) { _v.y = 0; }
@@ -179,13 +179,13 @@ class Motion implements IRecyclable
 	private function set_vx( vx:Float ) :Float 	{ return _v.x = vx; }
 	private function set_vy( vy:Float ) :Float 	{ return _v.y = vy; }
 	
-	private function get_fv() :Float 			{ return (_fv.x + _fv.y) * 0.5; }
-	private function set_fv( fv:Float ) :Float 	{ _fv.x = _fv.y = fv; return fv; }
+	private function get_fv() :Float 			{ return (_vf.x + _vf.y) * 0.5; }
+	private function set_fv( fv:Float ) :Float 	{ _vf.x = _vf.y = fv; return fv; }
 	
-	private function get_fx() :Float 			{ return _fv.x; }	
-	private function get_fy() :Float 			{ return _fv.y; }
-	private function set_fx( fx:Float ) :Float 	{ return _fv.x = fx; }
-	private function set_fy( fy:Float ) :Float 	{ return _fv.y = fy; }
+	private function get_fx() :Float 			{ return _vf.x; }	
+	private function get_fy() :Float 			{ return _vf.y; }
+	private function set_fx( fx:Float ) :Float 	{ return _vf.x = fx; }
+	private function set_fy( fy:Float ) :Float 	{ return _vf.y = fy; }
 	
 	private function get_inMotion() :Bool 
 	{ 
@@ -200,8 +200,8 @@ class Motion implements IRecyclable
 		_a.y = 0;
 		_v.x = 0;
 		_v.y = 0;
-		_fv.x = 1;
-		_fv.y = 1;
+		_vf.x = 1;
+		_vf.y = 1;
 		max_v = 0;
 		ar = 0;
 		vr = 0;		
@@ -210,14 +210,8 @@ class Motion implements IRecyclable
 		
 		_free = true;
 	}
-	public function isFree() :Bool
-	{
-		return _free;
-	}
-	public function use() :Void
-	{
-		_free = false;
-	}	
+	public function get_free() :Bool 			{ return _free; }
+	public function set_free( free:Bool ) :Bool { return _free = free; }
 	private var _free :Bool;
 	
 }

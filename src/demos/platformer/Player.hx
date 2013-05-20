@@ -2,21 +2,21 @@ package demos.platformer;
 
 import nme.display.Shape;
 import nme.ui.Keyboard;
-import sge.lib.World;
-import sge.physics.CollisionMath;
-import sge.physics.Vec2;
 
 import sge.core.Camera;
 import sge.core.Entity;
 import sge.core.Engine;
 import sge.graphics.Draw;
 import sge.geom.Box;
+import sge.io.Input;
 import sge.physics.AABB;
 import sge.physics.BoxCollider;
 import sge.physics.CollisionData;
 import sge.physics.Motion;
+import sge.physics.CollisionMath;
+import sge.physics.Vec2;
 import sge.random.Random;
-import sge.io.Input;
+import sge.world.World;
 
 
 /**
@@ -30,10 +30,16 @@ class Player extends Entity
 	private static var HEIGHT:Int = 40;	
 	private static var JUMP_HEIGHT:Int = 36;
 	private static var CROUCH_HEIGHT:Int = 32;
-	private static var SPEED:Float = 600;
-	private static var MAX_SPEED:Float = SPEED * 3;
-	private static var JUMP_THRUST:Float = SPEED * 5;
-	private static var FALL_SPEED:Float = SPEED * 1.8;
+	private static var SPEED:Float = 450;
+	private static var RUN_SPEED:Float = 600;
+	private static var CROUCH_SPEED:Float = 200;
+	private static var JUMP_THRUST:Float = 3000;
+	private static var FALL_SPEED:Float = 1000;
+	private static var FALL_FRICTION:Float = 0.01;
+	private static var WALK_FRICTION:Float = 0.0333;
+	private static var RUN_FRICTION:Float = 0.025;
+	private static var CROUCH_FRICTION:Float = 0.05;
+	private static var WALL_FRICTION:Float = 0.06;
 	
 	/*
 	 * Properties 
@@ -41,7 +47,10 @@ class Player extends Entity
 	public var paused:Bool = true;
 	public var jumping:Bool = false;
 	public var falling:Bool = true;
+	public var wall_jumping:Bool = false;
 	public var crouching:Bool = false;
+	public var on_wall:Bool = false;
+	public var running:Bool = false;
 	public var world:World;
 	
 	/*
@@ -49,17 +58,11 @@ class Player extends Entity
 	 */
 	private var jumpspeed:Float;
 	private var cur_jumpTime:Float = 0;
-	
+	private var wall_side:Int = 0;
 	private var _madeVisible:Bool = false;
 	private var _shape:Shape;
 	private var _box:Box;
 	private var _boxCollider:BoxCollider;
-	
-	/// Memory Saving (reused floats)
-	private var _mv:Float;
-	private var _m2:Float;
-	private var _nx:Float;
-	private var _ny:Float;
 
 	public function new() 
 	{
@@ -77,9 +80,8 @@ class Player extends Entity
 		_active = true;
 		state = Entity.DYNAMIC;
 		
-		motion.fx = 0.025;
-		motion.fy = 0.01;
-		_m2 = MAX_SPEED * MAX_SPEED;
+		motion.fx = WALK_FRICTION;
+		motion.fy = FALL_FRICTION;
 		
 	}
 	
@@ -88,21 +90,37 @@ class Player extends Entity
 		if (!active) { return; }
 		
 		var cdata = CollisionMath.getCollisionData();
+		
 		_input( delta );
 		_update( delta );		
 		_updateTransform( delta );
-		doWorldCollisions(world, cdata);		
+		doWorldCollisions(world, cdata);
+		
 		CollisionMath.freeCollisionData(cdata);
 	}
 	
 		
 	override private function _input(delta:Float):Void 
 	{
+		if ( Input.isKeyDown(Keyboard.SHIFT) ) {
+			running = true;
+		} else {
+			running = false;
+		}
+		
 		if ( Input.isKeyPressed(Keyboard.W) || Input.isKeyPressed(Keyboard.UP) ) {
 			if (!jumping && !falling) {
 				jumpspeed = JUMP_THRUST;
 				cur_jumpTime = 0;
 				jumping = true;	
+			} else
+			if (on_wall) {
+				motion.vx += JUMP_THRUST * 0.1 * -wall_side;
+				motion.vy = 0; // start from 0
+				jumpspeed = JUMP_THRUST;
+				cur_jumpTime = 0;
+				jumping = true;
+				wall_jumping = true;
 			}
 		} else 
 		if ( !Input.isKeyDown(Keyboard.W) && !Input.isKeyDown(Keyboard.UP) ) {
@@ -121,20 +139,39 @@ class Player extends Entity
 			cur_jumpTime += delta;
 			jumpspeed -= FALL_SPEED * cur_jumpTime;
 			motion.vy -= jumpspeed * delta;
-			
 		} else { 
+			wall_jumping = false;
 			jumping = false; 
 		}		
+		
 		if (falling) {
-			motion.vy += FALL_SPEED * delta;
+			if (on_wall && motion.vy > 0) {
+				motion.vy += FALL_SPEED * delta * 0.33;
+			} else {
+				motion.vy += FALL_SPEED * delta;
+			}
 		}
 		
 		if ( Input.isKeyDown(Keyboard.A) || Input.isKeyDown(Keyboard.LEFT) ) {
-			motion.vx -= SPEED * delta;
+			if (crouching && !jumping) {
+				motion.vx -= CROUCH_SPEED * delta;
+			} else
+			if (running) {
+				motion.vx -= RUN_SPEED * delta;
+			} else {
+				motion.vx -= SPEED * delta;
+			}
 		}
 		else
 		if ( Input.isKeyDown(Keyboard.D) || Input.isKeyDown(Keyboard.RIGHT) ) {
-			motion.vx += SPEED * delta;
+			if (crouching && !jumping) {
+				motion.vx += CROUCH_SPEED * delta;
+			} else
+			if (running) {
+				motion.vx += RUN_SPEED * delta;
+			} else {
+				motion.vx += SPEED * delta;
+			}
 		}
 		
 		if (crouching) {
@@ -154,14 +191,23 @@ class Player extends Entity
 
 	override private function _update( delta:Float ):Void 
 	{		
-		_mv = motion.vx * motion.vx + motion.vy * motion.vy;
-		if (_mv > _m2) {
-			_mv = Math.sqrt(_mv);
-			_nx = motion.vx / _mv;
-			_ny = motion.vy / _mv;
-			motion.vx = _nx * MAX_SPEED;
-			motion.vy = _ny * MAX_SPEED;
+		
+		if (on_wall) {
+			motion.fy = WALL_FRICTION;
+		} else {
+			motion.fy = FALL_FRICTION;
 		}
+		
+		if (crouching && !jumping) {
+			motion.fx = CROUCH_FRICTION;
+		} else
+		if (running) {
+			motion.fx = RUN_FRICTION;
+		} else {
+			motion.fx = WALK_FRICTION;
+		}
+		
+		
 	}	
 	
 	public function doWorldCollisions( world:World, cdata:CollisionData ) :Void {
@@ -171,8 +217,27 @@ class Player extends Entity
 		}
 		p.x = 0;
 		p.y = 0;
+		on_wall = false;
 		
-		CollisionData.getFirst(cdata);
+		aabb = getBounds();	
+		/// this is to prevent floor/cieling snagging
+		aabb.height -= world.tileData.tileHeight; 
+		aabb.y -= world.tileData.tileHeight * 0.25;
+		
+		if (world.collideAabb( aabb, 0, cdata )) {
+			p = CollisionData.getSmallest(cdata, p);
+			if (p.x != 0) {
+				motion.vx = 0;
+				x -= p.x;
+				on_wall = true;
+				if (p.x < 0) {
+					wall_side = -1;
+				} else {
+					wall_side = 1;
+				}
+			}
+		}
+		
 		aabb = getBounds();
 		aabb.width -= 2; /// this is to prevent wall grabbing		
 		
@@ -194,15 +259,7 @@ class Player extends Entity
 			falling = true;
 		}
 		
-		aabb = getBounds();		
-		aabb.height -= 2; /// this is to prevent floor/cieling snagging
-		if (world.collideAabb( aabb, 0, cdata )) {
-			p = CollisionData.getSmallest(cdata, p);
-			if (p.x != 0) {
-				motion.vx = 0;
-				x -= p.x;
-			}
-		}
+		
 	}
 	private var p:Vec2;
 	

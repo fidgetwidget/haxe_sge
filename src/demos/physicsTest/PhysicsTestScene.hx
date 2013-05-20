@@ -86,8 +86,8 @@ class PhysicsTestScene extends Scene
 		
 		mc = atlas.makeLayer(0);
 		
-		camera.width = cast(Engine.properties.get("_STAGE_WIDTH"), Int);
-		camera.height = cast(Engine.properties.get("_STAGE_HEIGHT"), Int);
+		camera.width = cast(Engine.properties.getValue("_STAGE_WIDTH"), Int);
+		camera.height = cast(Engine.properties.getValue("_STAGE_HEIGHT"), Int);
 		camera.x = 0;
 		camera.y = 0;
 		

@@ -1,9 +1,10 @@
 package sge.interfaces;
 
 import sge.physics.AABB;
+
 /**
- * ...
- * @author ...
+ * Not really used anymore, but it was for spacial indexing of non Entity objects...
+ * @author fidgetwidget
  */
 
 interface IHasBounds 

@@ -4,13 +4,15 @@ import nme.geom.Matrix;
 import nme.geom.Point;
 
 /**
- * @author fidgetwidget
+ * Transform 
+ * (a class for sharing transform data between objects)
+ * has position, rotation, and scale data (and z - paralax depth)
  * 
- * The core Transform component
  * position: 	x, y position relative to its parent.
  * z:			z draw position, used for draw order and paralax effects.
  * rotation:	rotation value relative to its parent.
  * scale:		x, y scale values relative to its parent.
+ * @author fidgetwidget
  */
 
 typedef TransformData = {

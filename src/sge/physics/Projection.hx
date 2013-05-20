@@ -3,6 +3,7 @@ package sge.physics;
 import sge.geom.LineSegment;
 
 /**
+ * ***NOT CURRENTLY USED***
  * single Axis Projection
  * @author fidgetwidget
  */

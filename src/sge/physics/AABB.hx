@@ -1,13 +1,20 @@
 package sge.physics;
 
 import nme.display.Graphics;
+import sge.interfaces.IRecyclable;
 
 /**
- * ...
- * @author fidget_widthidget
+ * Axis Aligned Bounding Box
+ * 
+ * meant to be used for FAST collision detection 
+ * 
+ * TODO: improve performance
+ *       create a AABB Factory for recycling these
+ * 
+ * @author fidgetwidget
  */
 
-class AABB
+class AABB implements IRecyclable
 {
 	
 	/*
@@ -41,12 +48,6 @@ class AABB
 	{
 		_center = new Vec2(); 
 		_extents = new Vec2();
-	}
-	
-	public function free() :Void 
-	{
-		_center.free();
-		_extents.free();
 	}
 	
 	public function setRect(x:Float, y:Float, width:Float, height:Float, fromCenter:Bool = false ) :AABB
@@ -145,6 +146,7 @@ class AABB
 		return false;
 	}
 	
+	/// Render
 	public function draw( graphics:Graphics ) :Void 
 	{
 		graphics.drawRect(x, y, width, height);
@@ -177,10 +179,19 @@ class AABB
 	private inline function set_right( x:Float ) :Float 	{ return _center.x = x - _extents.x; }
 	private inline function set_top( y:Float ) :Float 		{ return _center.y = y + _extents.y; }
 	private inline function set_bottom( y:Float ) :Float 	{ return _center.y = y - _extents.y; }
-
 	
+	/// IRecyclable
+	public function free() :Void 
+	{
+		_center.free();
+		_extents.free();
+		_free = true;
+	}
+	public function get_free() :Bool 			{ return _free; }
+	public function set_free( free:Bool ) :Bool { return _free = free; }
+	private var _free:Bool;
 	
-	// AABB Collisions
+	// static AABB Collisions
 	public static inline function aabbContainsPoint( 
 		aabb:AABB, 
 		x:Float, y:Float ) :Bool

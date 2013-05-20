@@ -6,7 +6,11 @@ import nme.geom.Matrix;
 import sge.physics.Projection;
 
 /**
- * ...
+ * Vector2D  
+ * stores x and y float values
+ * can be easily converted to/from Point
+ * has various useful math functions 
+ * 
  * @author fidgetwidget
  */
 class Vec2

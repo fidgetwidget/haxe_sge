@@ -66,8 +66,8 @@ class BreakerScene extends Scene
 		cdata = CollisionMath.getCollisionData();
 		mc = atlas.makeLayer(0);
 		
-		WIDTH = cast(Engine.properties.get("_STAGE_WIDTH"), Int);
-		HEIGHT = cast(Engine.properties.get("_STAGE_HEIGHT"), Int);
+		WIDTH = cast(Engine.properties.getValue("_STAGE_WIDTH"), Int);
+		HEIGHT = cast(Engine.properties.getValue("_STAGE_HEIGHT"), Int);
 		
 		camera.width = WIDTH;
 		camera.height = HEIGHT;
