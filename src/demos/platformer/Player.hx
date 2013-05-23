@@ -51,6 +51,7 @@ class Player extends Entity
 	public var crouching:Bool = false;
 	public var on_wall:Bool = false;
 	public var running:Bool = false;
+	public var wall_side:Int = 0;
 	public var world:World;
 	
 	/*
@@ -58,7 +59,7 @@ class Player extends Entity
 	 */
 	private var jumpspeed:Float;
 	private var cur_jumpTime:Float = 0;
-	private var wall_side:Int = 0;
+	
 	private var _madeVisible:Bool = false;
 	private var _shape:Shape;
 	private var _box:Box;
@@ -121,6 +122,7 @@ class Player extends Entity
 				cur_jumpTime = 0;
 				jumping = true;
 				wall_jumping = true;
+				on_wall = false;
 			}
 		} else 
 		if ( !Input.isKeyDown(Keyboard.W) && !Input.isKeyDown(Keyboard.UP) ) {
@@ -135,24 +137,13 @@ class Player extends Entity
 			crouching = false;
 		}
 		
-		if (jumping && jumpspeed > 0) {
-			cur_jumpTime += delta;
-			jumpspeed -= FALL_SPEED * cur_jumpTime;
-			motion.vy -= jumpspeed * delta;
-		} else { 
-			wall_jumping = false;
-			jumping = false; 
-		}		
-		
-		if (falling) {
-			if (on_wall && motion.vy > 0) {
-				motion.vy += FALL_SPEED * delta * 0.33;
-			} else {
-				motion.vy += FALL_SPEED * delta;
-			}
-		}
-		
 		if ( Input.isKeyDown(Keyboard.A) || Input.isKeyDown(Keyboard.LEFT) ) {
+			// unstick from wall
+			if (on_wall && wall_side > 0) {
+				on_wall = false;
+				x -= 1;
+			}
+			// move
 			if (crouching && !jumping) {
 				motion.vx -= CROUCH_SPEED * delta;
 			} else
@@ -164,16 +155,52 @@ class Player extends Entity
 		}
 		else
 		if ( Input.isKeyDown(Keyboard.D) || Input.isKeyDown(Keyboard.RIGHT) ) {
-			if (crouching && !jumping) {
+			// unstick from wall
+			if (on_wall && wall_side < 0) {
+				on_wall = false;
+				x += 1;
+			}
+			// move
+			if (crouching && !jumping && !running) {
 				motion.vx += CROUCH_SPEED * delta;
 			} else
-			if (running) {
+			if (running && !crouching) {
 				motion.vx += RUN_SPEED * delta;
 			} else {
 				motion.vx += SPEED * delta;
 			}
 		}
 		
+		
+		
+		
+	}
+
+	override private function _update( delta:Float ):Void 
+	{		
+		// jumping/falling 
+		if (jumping && jumpspeed > 0) {
+			cur_jumpTime += delta;
+			jumpspeed -= FALL_SPEED * cur_jumpTime;
+			// jumping motion
+			motion.vy -= jumpspeed * delta;
+		} else { 
+			wall_jumping = false;
+			jumping = false; 
+		}				
+		
+		if (falling) {			
+			// falling motion
+			if (on_wall && motion.vy > 0 && !crouching) {
+				// when on the wall (and not crouching), fall slower
+				motion.vy += FALL_SPEED * delta * 0.33;
+			} else {
+				motion.vy += FALL_SPEED * delta;
+			}
+		}
+		
+		
+		// state managed bounding box
 		if (crouching) {
 			_box.height = CROUCH_HEIGHT;
 			_box.y = -CROUCH_HEIGHT * 0.5;
@@ -186,22 +213,17 @@ class Player extends Entity
 			_box.y = -HEIGHT * 0.5;
 		}
 		
-		
-	}
-
-	override private function _update( delta:Float ):Void 
-	{		
-		
+		// state managed friction
 		if (on_wall) {
 			motion.fy = WALL_FRICTION;
 		} else {
 			motion.fy = FALL_FRICTION;
 		}
 		
-		if (crouching && !jumping) {
+		if (crouching && !jumping && !running) {
 			motion.fx = CROUCH_FRICTION;
 		} else
-		if (running) {
+		if (running && !crouching) {
 			motion.fx = RUN_FRICTION;
 		} else {
 			motion.fx = WALK_FRICTION;
@@ -218,6 +240,7 @@ class Player extends Entity
 		p.x = 0;
 		p.y = 0;
 		on_wall = false;
+		wall_side = 0;
 		
 		aabb = getBounds();	
 		/// this is to prevent floor/cieling snagging
@@ -228,13 +251,17 @@ class Player extends Entity
 			p = CollisionData.getSmallest(cdata, p);
 			if (p.x != 0) {
 				motion.vx = 0;
-				x -= p.x;
 				on_wall = true;
+				// reduce the push out so that we STAY on the wall till we jump off
 				if (p.x < 0) {
+					p.x += 0.5;
 					wall_side = -1;
-				} else {
+				} else
+				if (p.x > 0) {
+					p.x -= 0.5;
 					wall_side = 1;
 				}
+				x -= p.x;
 			}
 		}
 		
@@ -254,6 +281,17 @@ class Player extends Entity
 					falling = true; 
 				}
 				y -= p.y;
+			}
+			
+			// prevent on wall and on ground at the same time
+			if (on_wall) {
+				if (wall_side > 0) {
+					x -= 0.5;
+				} else
+				if (wall_side < 0) {
+					x += 0.5;
+				}
+				on_wall = false;
 			}
 		} else {
 			falling = true;

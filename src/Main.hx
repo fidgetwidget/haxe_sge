@@ -20,6 +20,7 @@ class Main
 		
 		var root = Lib.current;
 		var stage = root.stage;
+		stage.frameRate = 61; // set to 61 so that it doesn't wiggle around 59~60
 
 		/// These should maybe be set by the engine, and not in main... but not sure yet how I want to handle that...
 		stage.align = nme.display.StageAlign.TOP_LEFT;

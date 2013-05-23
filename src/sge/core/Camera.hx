@@ -25,7 +25,8 @@ class Camera
 	
 	public static inline var TARGET_GOTO :Int = 0; // move to point, then stop
 	public static inline var TARGET_FIXED:Int = 1; // fixed point follow
-	public static inline var TARGET_CLOSE:Int = 2; // follow tight square
+	public static inline var TARGET_TIGHT:Int = 2; // follow point with close delay
+	public static inline var TARGET_CLOSE:Int = 3; // follow tight square
 	public static inline var TARGET_LOOSE:Int = 4; // follow large square
 	
 	//* amount in % of the camera bounds
@@ -95,16 +96,20 @@ class Camera
 		if (_targetType == TARGET_FIXED) {
 			bounds.cx = _target.x;
 			bounds.cy = _target.y;
-		}
-		else
+		} else
+		if (_targetType == TARGET_TIGHT) {
+			if (bounds.cx != _target.x || bounds.cy != _target.y) {
+				moveTo(_target.x, _target.y, 0.33, _targetEase);
+			}			
+		} else
 		if (_targetType == TARGET_CLOSE ||
 		 _targetType == TARGET_LOOSE) {
 			_targetBounds.cx = bounds.cx;
 			_targetBounds.cy = bounds.cy;
 			
-			if (!_targetBounds.containsPoint(_target.x, _target.y)) {
+			if (!_targetBounds.containsPoint(_target.x, _target.y)) {				
 				bounds.cx -= (bounds.cx - _target.x) * _targetEase.calculate(delta);
-				bounds.cy -= (bounds.cy - _target.y) * _targetEase.calculate(delta);
+				bounds.cy -= (bounds.cy - _target.y) * _targetEase.calculate(delta);				
 			}
 		}
 	}

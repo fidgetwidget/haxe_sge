@@ -35,8 +35,8 @@ class World
 	
 	/// Used in the constructor 
 	/// TODO: change this to be loaded on init with optional params
-	public static inline var region_rows 	: Int = 128;
-	public static inline var region_cols 	: Int = 64;
+	public static inline var region_rows 	: Int = 16;
+	public static inline var region_cols 	: Int = 16;
 	
 	/// Used in the init call
 	/// TODO: change this to be loaded on init with optional params
@@ -90,7 +90,7 @@ class World
 		
 		for (i in 0...layer_count) {
 			layers[i] = [];
-			layers_data[i] = new BitmapData(world_region_cols, world_region_rows, false);
+			//layers_data[i] = new BitmapData(world_tile_cols, world_tile_rows, false);
 		}
 		
 		for (r in 0...world_region_rows) {
@@ -125,6 +125,17 @@ class World
 			}
 			r++;
 			c = 0;
+		}
+	}
+	
+	/// Temporary way of loading in map data for the purposes of the demo...
+	public function loadMap( array:Array<Int>, layer:Int = 0 ) :Void {
+		var r:Int = 0;
+		var c:Int = 0;
+		for (i in 0...array.length) {
+			r = Math.floor(i / world_tile_cols);
+			c = i % world_tile_cols;
+			setTile(r, c, array[i], layer);
 		}
 	}
 	
