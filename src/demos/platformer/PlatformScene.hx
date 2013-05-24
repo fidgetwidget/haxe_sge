@@ -75,7 +75,7 @@ class PlatformScene extends Scene
 		entities = grid;
 		mc = atlas.makeLayer(0);
 		
-		var tileData = new TileData();
+		var tileData = new TileData("img/tiles.png", 16, 16);
 		world.loadAssets(tileData);
 		
 		camera.width = cast(Engine.properties.getValue("_STAGE_WIDTH"), Int);

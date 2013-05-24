@@ -5,6 +5,7 @@ import nme.display.BitmapData;
 import nme.display.Tilesheet;
 import nme.geom.Rectangle;
 import sge.geom.Box;
+import sge.graphics.AssetManager;
 import sge.physics.BoxCollider;
 import sge.physics.Collider;
 
@@ -30,16 +31,16 @@ class TileData
 	public var tileTypeCount	:Int;
 	public var bitmapData		:BitmapData;	
 	public var tilesheet		:Tilesheet;	
-	private var tileRectangles	:Array<Rectangle>;
+	
 	private var collisionData	:Array<Int>; 
 
-	public function new( tileWidth:Int = 16, tileHeight:Int = 16 ) 
+	public function new( assetString:String, tileWidth:Int = 16, tileHeight:Int = 16 ) 
 	{
-		bitmapData = Assets.getBitmapData("img/tiles.png");
+		bitmapData = AssetManager.getBitmap(assetString);
 		tilesheet = new Tilesheet(bitmapData);
 		this.tileWidth = tileWidth;
 		this.tileHeight = tileHeight;
-		tileRectangles = [];
+		
 		collisionData = [];
 		
 		_box = new Box(tileWidth * 0.5, tileHeight * 0.5, tileWidth, tileHeight);
@@ -57,8 +58,8 @@ class TileData
 		tileTypeCount = 0; // doubles as the current tile index
 		while (r < mr) {
 			while (c < mc) {
-				tileRectangles[tileTypeCount] = new Rectangle(c * tileWidth,  r * tileHeight, tileWidth, tileHeight);
-				tilesheet.addTileRect(tileRectangles[tileTypeCount]);
+				var rect = new Rectangle(c * tileWidth,  r * tileHeight, tileWidth, tileHeight);
+				tilesheet.addTileRect(rect);
 				
 				// TODO: load the collision data, not just set all to SOLID
 				collisionData[tileTypeCount] = SOLID_TILE; // default, temp value 

@@ -2,6 +2,7 @@ package sge.graphics;
 
 import nme.display.BitmapData;
 import nme.Assets;
+import nme.display.Tilesheet;
 
 /**
  * ...
@@ -14,7 +15,7 @@ class AssetManager
 	public static function init() :Void {
 		
 		_images = new Hash<BitmapData>();
-		
+		_tilesheets = new Hash<Tilesheet>();
 	}
 	
 	public static function saveBitmap( source:Dynamic ) :Bool {
@@ -53,5 +54,8 @@ class AssetManager
 	
 	// Asset hash table
 	private static var _images:Hash<BitmapData>;
+	
+	// TODO: store tilesheets for bitmaps too?
+	private static var _tilesheets:Hash<Tilesheet>;
 	
 }
