@@ -6,6 +6,7 @@ import nme.display.Tilesheet;
 import nme.geom.Rectangle;
 import sge.geom.Box;
 import sge.graphics.AssetManager;
+import sge.graphics.Tileset;
 import sge.physics.BoxCollider;
 import sge.physics.Collider;
 
@@ -28,16 +29,18 @@ class TileData
 	
 	public var tileWidth		:Int;
 	public var tileHeight		:Int;
-	public var tileTypeCount	:Int;
-	public var bitmapData		:BitmapData;	
-	public var tilesheet		:Tilesheet;	
+	public var tileset			:Tileset;
+	
+	public var bitmapData(get_bitmapData, null):BitmapData;	
+	public var tilesheet(get_tilesheet, null):Tilesheet;	
+	public var tileTypeCount(get_tileTypeCount, null):Int;
 	
 	private var collisionData	:Array<Int>; 
+	
 
 	public function new( assetString:String, tileWidth:Int = 16, tileHeight:Int = 16 ) 
 	{
-		bitmapData = AssetManager.getBitmap(assetString);
-		tilesheet = new Tilesheet(bitmapData);
+		tileset = new Tileset( AssetManager.getBitmap(assetString) );
 		this.tileWidth = tileWidth;
 		this.tileHeight = tileHeight;
 		
@@ -47,33 +50,17 @@ class TileData
 		_boxCollider = new BoxCollider(_box);
 		_boxCollider.useCenterPosition = false;
 		
-		initTilesheet();		
-	}
-	
-	public function initTilesheet() :Void {
-		var r = 0;
-		var c = 0;
-		var mr = Math.floor(bitmapData.height / tileHeight);
-		var mc = Math.floor(bitmapData.width / tileWidth);
-		tileTypeCount = 0; // doubles as the current tile index
-		while (r < mr) {
-			while (c < mc) {
-				var rect = new Rectangle(c * tileWidth,  r * tileHeight, tileWidth, tileHeight);
-				tilesheet.addTileRect(rect);
-				
-				// TODO: load the collision data, not just set all to SOLID
-				collisionData[tileTypeCount] = SOLID_TILE; // default, temp value 
-				
-				tileTypeCount++;
-				c++;
-			}
-			r++;
-			c = 0;
-		}		
-		collisionData[0] = EMPTY_TILE; // default, temp value 
+		tileset.init(tileWidth, tileHeight, Std.int(tileset.source.width / tileWidth), Std.int(tileset.source.height / tileHeight));
+		for (i in 1...tileTypeCount) {
+			collisionData[i] = SOLID_TILE;
+		}	
+		collisionData[0] = EMPTY_TILE; // default, temp value 	
+		
 	}
 	
 	/// TODO: move the logic for drawing a single tile here
+	
+	
 	
 	/// get a colllider for the given tileIndex at the given position
 	public function getCollider( tileIndex:Int, x:Float, y:Float ) :Collider
@@ -92,5 +79,10 @@ class TileData
 	}
 	private var _box:Box;
 	private var _boxCollider:BoxCollider;
+	
+	
+	private function get_bitmapData() :BitmapData { return tileset.source; }
+	private function get_tilesheet() :Tilesheet { return tileset.tilesheet; }
+	private function get_tileTypeCount() :Int { return tileset.tileCount; }
 	
 }

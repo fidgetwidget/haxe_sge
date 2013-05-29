@@ -2,7 +2,7 @@ package sge.physics;
 
 import nme.geom.Point;
 import nme.geom.Matrix;
-
+import sge.interfaces.IRecyclable;
 import sge.physics.Projection;
 
 /**
@@ -13,7 +13,7 @@ import sge.physics.Projection;
  * 
  * @author fidgetwidget
  */
-class Vec2
+class Vec2 implements IRecyclable
 {
 
 	public var x:Float;
@@ -23,12 +23,6 @@ class Vec2
 	public function new(x:Float = 0, y:Float = 0) {
 		this.x = x;
 		this.y = y;
-	}
-	
-	public function free() :Void 
-	{
-		x = 0;
-		y = 0;
 	}
 	
 	// Point conversion function
@@ -163,11 +157,24 @@ class Vec2
 		return Math.sqrt(x * x + y * y);
 	}
 	
+	/*
+	 * IRecycleable 
+	 */
+	public function free() :Void 
+	{		
+		x = 0;
+		y = 0;
+		_free = true;
+	}
+	public function get_free() :Bool { return _free; }
+	public function set_free( free:Bool ) :Bool { return _free = free; }
+	private var _free:Bool = false;
 	
 	
+	/// ------------------------------
+	/// Static Math functions
+	/// ------------------------------
 	
-	
-	// Static Math functions
 	// returns the length of the given vectors values
 	public static inline function lengthOf(x:Float, y:Float) :Float
 	{

@@ -180,16 +180,18 @@ class AABB implements IRecyclable
 	private inline function set_top( y:Float ) :Float 		{ return _center.y = y + _extents.y; }
 	private inline function set_bottom( y:Float ) :Float 	{ return _center.y = y - _extents.y; }
 	
-	/// IRecyclable
+	/*
+	 * IRecycleable 
+	 */
 	public function free() :Void 
-	{
+	{		
 		_center.free();
 		_extents.free();
 		_free = true;
 	}
-	public function get_free() :Bool 			{ return _free; }
+	public function get_free() :Bool { return _free; }
 	public function set_free( free:Bool ) :Bool { return _free = free; }
-	private var _free:Bool;
+	private var _free:Bool = false;
 	
 	// static AABB Collisions
 	public static inline function aabbContainsPoint( 

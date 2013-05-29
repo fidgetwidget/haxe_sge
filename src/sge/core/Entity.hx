@@ -34,6 +34,8 @@ class Entity implements IHasBounds, implements IHasId, implements IRecyclable
 		
 	public var x(get_x, set_x):Float;
 	public var y(get_y, set_y):Float;
+	public var ix(get_ix, set_ix):Int;
+	public var iy(get_iy, set_iy):Int;
 	public var rotation(get_r, set_r):Float;
 	public var scaleX(get_sx, set_sx):Float;
 	public var scaleY(get_sy, set_sy):Float;
@@ -88,7 +90,7 @@ class Entity implements IHasBounds, implements IHasId, implements IRecyclable
 	private function _updateTransform( delta:Float ) :Void 
 	{
 		if (motion == null || !motion.inMotion) { return; }
-		motion.apply( _t, delta );
+		motion.apply( _t, delta ); // non collision transform update
 	}
 	
 	
@@ -152,12 +154,16 @@ class Entity implements IHasBounds, implements IHasId, implements IRecyclable
 	 */
 	private function get_x() :Float 			{ return (parent == null) ? _t.x : _t.x + parent.x; }
 	private function get_y() :Float 			{ return (parent == null) ? _t.y : _t.y + parent.y; }
+	private function get_ix() :Int				{ return (parent == null) ? _t.ix : _t.ix + parent.ix; }
+	private function get_iy() :Int				{ return (parent == null) ? _t.iy : _t.iy + parent.iy; }
 	private function get_r() :Float 			{ return (parent == null) ? _t.rotation : _t.rotation + parent.rotation; }
 	private function get_sx() :Float 			{ return (parent == null) ? _t.scaleX : _t.scaleX + parent.scaleX; }
 	private function get_sy() :Float			{ return (parent == null) ? _t.scaleY : _t.scaleY + parent.scaleY; }
 		
 	private function set_x( x:Float ) :Float 	{ return _t.x = (parent == null) ? x : x - parent.x; }
 	private function set_y( y:Float ) :Float 	{ return _t.y = (parent == null) ? y : y - parent.y; }
+	private function set_ix( x:Int ) :Int		{ return _t.ix = (parent == null) ? x : x - parent.ix; }
+	private function set_iy( y:Int ) :Int		{ return _t.iy = (parent == null) ? y : y - parent.iy; }
 	private function set_r( r:Float ) :Float 	{ return _t.rotation = (parent == null) ? r : r - parent.rotation; }
 	private function set_sx( sx:Float ) :Float 	{ return _t.scaleX = (parent == null) ? sx : sx - parent.scaleX; }
 	private function set_sy( sy:Float ) :Float 	{ return _t.scaleY = (parent == null) ? sy : sy - parent.scaleY; }
@@ -174,20 +180,10 @@ class Entity implements IHasBounds, implements IHasId, implements IRecyclable
 	private function set_active( active:Bool ) :Bool 	{ return _active = active; }
 	
 	
-	/// IRecyclable
-	public function free() :Void 
-	{
-		_t.free();	
-		if (_m != null) {
-			_m.free();
-		}
-		_free = true;
-	}
-	public function get_free() :Bool 			{ return _free; }
-	public function set_free( free:Bool ) :Bool { return _free = free; }
-	private var _free:Bool;
 	
-	//** IHasBounds
+	/*
+	 * IHasBounds 
+	 */
 	public function getBounds() :AABB
 	{
 		if (collider == null)  
@@ -195,10 +191,28 @@ class Entity implements IHasBounds, implements IHasId, implements IRecyclable
 		else
 			return collider.getBounds();
 	}
-	//** IHasId
+	/*
+	 * IHasId 
+	 */
 	public function getId() :Int
 	{
 		return id;
 	}
+	
+	/*
+	 * IRecycleable 
+	 */
+	public function free() :Void 
+	{		
+		// free's up only the things that are initialized in the constructor
+		_t.free();	
+		if (_m != null) {
+			_m.free();
+		}
+		_free = true;
+	}
+	public function get_free() :Bool { return _free; }
+	public function set_free( free:Bool ) :Bool { return _free = free; }
+	private var _free:Bool = false;
 	
 }

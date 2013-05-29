@@ -7,6 +7,7 @@ import nme.display.Tilesheet;
 import nme.geom.Rectangle;
 import sge.core.Camera;
 import sge.graphics.Draw;
+import sge.graphics.TileFrames;
 import sge.physics.AABB;
 import sge.physics.Collider;
 import sge.physics.CollisionData;
@@ -61,10 +62,15 @@ class World
 	 */	
 	public var layers:Array<Array<Region>>; // outer array is the layer, inner array is the grid of regions
 	public var layers_data:Array<BitmapData>;
+
 	public var tileData:TileData;
 	public var tileBitmap(get_tileBitmap, never):BitmapData;
-	public var tilesheet(get_tilesheet, never):Tilesheet;
+	public var tilesheet(get_tilesheet, never):Tilesheet;	
 	public var initialized(default, null):Bool = false;
+	
+	private var tileFrames:TileFrames;
+	private var _renderIndex:Int = 0;
+	private var _renderTiles:Array<Float>;
 	
 
 	/**
@@ -113,19 +119,8 @@ class World
 		
 		this.tileData = tileData;
 		
-		var r = 0;
-		var c = 0;
-		var mr = Math.floor(tileBitmap.height / cell_height);
-		var mc = Math.floor(tileBitmap.width / cell_width);
-		while (r < mr) {
-			while (c < mc) {
-				tilesheet.addTileRect(new Rectangle(c * cell_width,  r * cell_height, cell_width, cell_height));
-				tile_type_count++;
-				c++;
-			}
-			r++;
-			c = 0;
-		}
+		tileFrames = new TileFrames(tilesheet);
+		tile_type_count = tileData.tileset.tileCount;
 	}
 	
 	/// Temporary way of loading in map data for the purposes of the demo...
@@ -207,30 +202,41 @@ class World
 		// get the relevant row/col values
 		_r = get_row( camera.bounds.top );
 		_c = get_col( camera.bounds.left );		
-		_m_r = get_row( camera.bounds.bottom) + 1;
-		_m_c = get_col( camera.bounds.right) + 1;		
+		mr = get_row( camera.bounds.bottom) + 1;
+		mc = get_col( camera.bounds.right) + 1;		
 		if (_r < 0) { _r = 0; }
 		if (_c < 0) { _c = 0; }		
-		if (_m_r > world_tile_rows) { _m_r = world_tile_rows; }
-		if (_m_c > world_tile_cols) { _m_c = world_tile_cols; }
-		_c_start = _c;
+		if (mr > world_tile_rows) { mr = world_tile_rows; }
+		if (mc > world_tile_cols) { mc = world_tile_cols; }
+		c_start = _c;
 		
 		// clear the list of tiles to render
-		_renderTiles.splice(0, _renderTiles.length);
+		tileFrames.clear();
 		
 		// add the relevant tiles to the list
-		while ( _r < _m_r ) {
-			while ( _c < _m_c ) {
-				render_addTile(_r, _c, camera);
+		while ( _r < mr ) {
+			while ( _c < mc ) {
+				frame = getTile(_r, _c);
+				
+				// don't draw frame 0's
+				if (frame != 0) {
+					xx = (_c * cell_width) - camera.x;
+					yy = (_r * cell_height) - camera.y;
+					tileFrames.addFrame(xx, yy, frame);
+				}
+				
 				_c++;
 			}
-			_c = _c_start;
+			_c = c_start;
 			_r++;
 		}
 		
 		// render the list
-		renderTiles();
+		tileFrames.drawTiles();
 	}
+	private var frame:Int;
+	private var xx:Float;
+	private var yy:Float;
 	
 	
 	public function drawCursorTile( x:Float, y:Float, tile:Int, camera:Camera ) :Void {
@@ -241,17 +247,13 @@ class World
 		// get the row/col value from the cursor position
 		_r = get_row(y);
 		_c = get_col(x);
-		
+		xx = (_c * cell_width) - camera.x;
+		yy = (_r * cell_height) - camera.y;
 		// draw the tile
-		tilesheet.drawTiles(Draw.graphics, 
-		 [
-		 (_c * cell_width) - camera.x,
-		 (_r * cell_height) - camera.y, 
-		 tile
-		 ]);
+		tilesheet.drawTiles(Draw.graphics, [ xx, yy, tile ]);
 		// draw a line around it 
 		Draw.graphics.lineStyle(0.3, 0x000000);
-		Draw.graphics.drawRect((_c * cell_width) - camera.x, (_r * cell_height) - camera.y, cell_width, cell_height);
+		Draw.graphics.drawRect(xx, yy, cell_width, cell_height);
 		Draw.graphics.lineStyle(0, 0);
 	}
 	
@@ -262,13 +264,13 @@ class World
 		// get the relevant row/col values		
 		_r = get_row( camera.bounds.top );
 		_c = get_col( camera.bounds.left );
-		_m_r = get_row( camera.bounds.bottom) + 1;
-		_m_c = get_col( camera.bounds.right) + 1;
+		mr = get_row( camera.bounds.bottom) + 1;
+		mc = get_col( camera.bounds.right) + 1;
 		if (_r < 0) { _r = 0; }
 		if (_c < 0) { _c = 0; }
-		if (_m_r > world_tile_rows) { _m_r = world_tile_rows; }
-		if (_m_c > world_tile_cols) { _m_c = world_tile_cols; }
-		_c_start = _c;
+		if (mr > world_tile_rows) { mr = world_tile_rows; }
+		if (mc > world_tile_cols) { mc = world_tile_cols; }
+		c_start = _c;
 		
 		// set the region row/col offset
 		rr = _r - _r % region_rows;
@@ -276,8 +278,8 @@ class World
 		
 		// draw the lines
 		Draw.graphics.lineStyle(0.5, 0xFF0000);		
-		while (rr <= _m_r) {
-			while (cc <= _m_c) {
+		while (rr <= mr) {
+			while (cc <= mc) {
 				Draw.graphics.moveTo( (cc * cell_width) - camera.x, 0 );
 				Draw.graphics.lineTo( (cc * cell_width) - camera.x, camera.height );
 				
@@ -293,35 +295,21 @@ class World
 		var collider:Collider;
 		rr = _r;
 		cc = _c;
-		while (rr <= _m_r) {
-			while (cc <= _m_c) {
+		while (rr <= mr) {
+			while (cc <= mc) {
 				if (getTile(rr, cc, 0) != 0) {
 					collider = tileData.getCollider(1, cc * cell_width, rr * cell_height);
 					Draw.debug_drawAABB(collider.getBounds(), camera);
 				}
 				cc++;
 			}
-			cc = _c_start;
+			cc = c_start;
 			rr++;
 		}
 		Draw.graphics.lineStyle(0, 0, 0);
 		
 	}
-	
-	/// Render Helper
-	private function render_addTile( r, c, camera:Camera ) :Void {
-		_renderIndex = getTile(r, c);
-		if (_renderIndex > 0) {
-			_renderTiles.push( (c * cell_width) - camera.x  );
-			_renderTiles.push( (r * cell_height) - camera.y );
-			_renderTiles.push( _renderIndex );	
-		}
-	}	
-	private function renderTiles() :Void {
-		tilesheet.drawTiles(Draw.graphics, _renderTiles);
-	}
-	private var _renderIndex:Int = 0;
-	private var _renderTiles:Array<Float>;
+
 
 	/*
 	 * Collision Functions
@@ -342,20 +330,20 @@ class World
 		
 		var collides:Bool = false;
 		
-		_r = get_row( aabb.top ) - 1;
-		_c = get_col( aabb.left ) - 1;
-		_m_r = get_row( aabb.bottom ) + 1;
-		_m_c = get_col( aabb.right ) + 1;
+		_r = get_row( aabb.top - 1 );
+		_c = get_col( aabb.left - 1 );
+		mr = get_row( aabb.bottom + 1 );
+		mc = get_col( aabb.right + 1 );
 		if (_r < 0) { _r = 0; }
 		if (_c < 0) { _c = 0; }
-		if (_m_r > world_tile_rows) { _m_r = world_tile_rows; }
-		if (_m_c > world_tile_cols) { _m_c = world_tile_cols; }
-		_c_start = _c;
+		if (mr > world_tile_rows) { mr = world_tile_rows; }
+		if (mc > world_tile_cols) { mc = world_tile_cols; }
+		c_start = _c;
 		rr = _r;
 		cc = _c;
 		
-		while (rr < _m_r + 1) {
-			while (cc < _m_c + 1) {
+		while (rr < mr + 1) {
+			while (cc < mc + 1) {
 				if (collideTile( rr, cc, aabb, layer, cdata )) {
 					if (cdata != null) {
 						cdata = cdata.setNext();
@@ -364,7 +352,7 @@ class World
 				}
 				cc++;
 			}
-			cc = _c_start;
+			cc = c_start;
 			rr++;
 		}
 		if (cdata != null) {
@@ -451,9 +439,9 @@ class World
 	private var rr:Int;
 	private var _c:Int;
 	private var cc:Int;
-	private var _c_start:Int;
-	private var _m_r:Int;
-	private var _m_c:Int;
+	private var c_start:Int;
+	private var mr:Int;
+	private var mc:Int;
 	private var x_offset:Int;
 	private var y_offset:Int;
 }

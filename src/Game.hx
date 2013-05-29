@@ -55,6 +55,9 @@ class Game extends Engine {
 		_brickBreakerScene = new BreakerScene();
 		this.addScene(_brickBreakerScene);
 		
+		//_platformerScene = new PlatformScene();
+		//this.addScene(_platformerScene, true);
+		
 		_platformerScene = new PlatformScene();
 		this.addScene(_platformerScene, true);
 		

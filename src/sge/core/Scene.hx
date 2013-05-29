@@ -3,16 +3,17 @@ package sge.core;
 import nme.display.Graphics;
 import nme.geom.Point;
 import haxe.FastList;
+import sge.interfaces.IRecyclable;
 
 import sge.graphics.Atlas;
 import sge.graphics.Draw;
 
 /**
- * ...
+ * 
  * @author fidgetwidget
  */
 
-class Scene
+class Scene implements IRecyclable
 {
 	
 	/*
@@ -62,14 +63,6 @@ class Scene
 		this.parent = parent;
 	}
 	
-	public function free() :Void 
-	{		
-		visible = false;
-		active = false;
-		_offset = null;
-		entities = null;
-	}
-	
 	/**
 	 * Begin Exiting the scene
 	 * NOTE: this function is called when a new scene is set to ready by the scene manager
@@ -97,7 +90,7 @@ class Scene
 		
 	}
 	
-	//** Update and Render
+	///  Update and Render
 	public function update( delta:Float ) :Void 
 	{				
 		if (!active && !inTransition && !ending) { return; }
@@ -106,7 +99,6 @@ class Scene
 		_update( delta );
 		_postUpdate( delta );		
 	}
-	
 	private function _updateTransition( delta:Float ) :Void 
 	{
 		
@@ -122,14 +114,11 @@ class Scene
 			}
 		}
 	}
-	
 	private function _handleInput( delta:Float ) :Void 
 	{
 		/// Each Scene can have their own input handling
 		/// You can also put this logic in the Entities
 	}
-	
-	
 	private function _update( delta:Float ) :Void 
 	{
 		if (entities == null) { return; }
@@ -138,11 +127,10 @@ class Scene
 			e.update( delta );
 		}
 		
-	}
-	
-	
+	}	
 	private function _postUpdate( delta:Float ) :Void 
 	{
+		camera.update(delta); // always update the camera last
 		
 		if (on_Exit != null && ending && transitionTime == 0)
 		{ 
@@ -164,9 +152,7 @@ class Scene
 		}
 	}
 	
-	/// ------------------------------------------------------------------- 
 	///  Entity Managment
-	/// -------------------------------------------------------------------
 	public function add( e:Entity ) :Void {	
 		
 		if (entities == null) { 
@@ -182,7 +168,7 @@ class Scene
 	}
 	
 	
-	//** Getters and Setters
+	///  Getters and Setters
 	private function get_count() :Int	{ return entities.count; }
 	
 	private function get_offset() :Point { 
@@ -210,4 +196,19 @@ class Scene
 	private inline function get_inTransition() :Bool { return transitionTime != 0;  }
 	private inline function get_transitionValue() :Float { return !inTransition ? 0 : transitionTime / (ending ? transitionOffTime : transitionOnTime); }
 	
+	
+	/*
+	 * IRecycleable 
+	 */
+	public function free() :Void 
+	{		
+		visible = false;
+		active = false;
+		_offset = null;
+		entities = null;
+		_free = true;
+	}
+	public function get_free() :Bool { return _free; }
+	public function set_free( free:Bool ) :Bool { return _free = free; }
+	private var _free:Bool = false;
 }

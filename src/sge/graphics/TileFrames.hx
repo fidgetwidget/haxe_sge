@@ -40,7 +40,11 @@ class TileFrames
 	 * @return	the index of the newly added tile
 	 */
 	public function addFrame( x:Float, y:Float, frame:Int, scale:Float = 0, rotation:Float = 0 ) :Void 
-	{		
+	{	
+		// convert to int so that we don't draw off pixel
+		x = Std.int(x);
+		y = Std.int(y);
+		
 		_tileData.push(x);
 		_tileData.push(y);
 		_tileData.push(frame);
@@ -77,6 +81,6 @@ class TileFrames
 	}
 	
 	/// internal use boolean from flags
-	private function set_useScale() :Void { _useScale = _flags & nme.display.Tilesheet.TILE_SCALE > 0; }
-	private function set_useRotation() :Void { _useRotate = _flags & nme.display.Tilesheet.TILE_ROTATION > 0; }
+	private function set_useScale() :Void { _useScale = _flags & Tilesheet.TILE_SCALE > 0; }
+	private function set_useRotation() :Void { _useRotate = _flags & Tilesheet.TILE_ROTATION > 0; }
 }

@@ -64,6 +64,7 @@ class Player extends Entity
 	private var _shape:Shape;
 	private var _box:Box;
 	private var _boxCollider:BoxCollider;
+	private var cdata:CollisionData;
 
 	public function new() 
 	{
@@ -81,6 +82,9 @@ class Player extends Entity
 		_active = true;
 		state = Entity.DYNAMIC;
 		
+		on_wall = false;
+		wall_side = 0;
+		
 		motion.fx = WALK_FRICTION;
 		motion.fy = FALL_FRICTION;
 		
@@ -90,11 +94,12 @@ class Player extends Entity
 	{
 		if (!active) { return; }
 		
-		var cdata = CollisionMath.getCollisionData();
-		
 		_input( delta );
 		_update( delta );		
 		_updateTransform( delta );
+		
+		cdata = CollisionMath.getCollisionData();
+		
 		doWorldCollisions(world, cdata);
 		
 		CollisionMath.freeCollisionData(cdata);
@@ -233,40 +238,28 @@ class Player extends Entity
 	}	
 	
 	public function doWorldCollisions( world:World, cdata:CollisionData ) :Void {
-		var aabb:AABB;
 		if (p == null) {
 			p = new Vec2();
 		}
 		p.x = 0;
 		p.y = 0;
-		on_wall = false;
-		wall_side = 0;
 		
-		aabb = getBounds();	
-		/// this is to prevent floor/cieling snagging
-		aabb.height -= world.tileData.tileHeight; 
-		aabb.y -= world.tileData.tileHeight * 0.25;
-		
-		if (world.collideAabb( aabb, 0, cdata )) {
-			p = CollisionData.getSmallest(cdata, p);
-			if (p.x != 0) {
-				motion.vx = 0;
-				on_wall = true;
-				// reduce the push out so that we STAY on the wall till we jump off
-				if (p.x < 0) {
-					p.x += 0.5;
-					wall_side = -1;
-				} else
-				if (p.x > 0) {
-					p.x -= 0.5;
-					wall_side = 1;
-				}
-				x -= p.x;
-			}
+		if ( Math.abs(motion.vx) > Math.abs(motion.vy) || falling ) {
+			collideVertical( world, cdata );
+			collideHorizontal( world, cdata );
+		} else {			
+			collideHorizontal( world, cdata );
+			collideVertical( world, cdata );
 		}
 		
+	}
+	private var p:Vec2;
+	private var aabb:AABB;
+	
+	private function collideVertical( world:World, cdata:CollisionData ) :Void 
+	{
 		aabb = getBounds();
-		aabb.width -= 2; /// this is to prevent wall grabbing		
+		aabb.width -= 2; /// this is to prevent snagging
 		
 		// do top/bottom collision
 		if (world.collideAabb( aabb, 0, cdata )) {
@@ -275,38 +268,49 @@ class Player extends Entity
 				motion.vy = 0;
 				
 				if (p.y > 0) {
-					falling = false;			
+					falling = false;
+					// prevent on wall and on ground at the same time
+					if (on_wall) {				
+						on_wall = false;
+						wall_side = 0;
+					}
 				} else {
-					jumping = false;
+					// if we hit our head, set falling to true (but keep jumping)
 					falling = true; 
 				}
 				y -= p.y;
-			}
-			
-			// prevent on wall and on ground at the same time
-			if (on_wall) {
-				if (wall_side > 0) {
-					x -= 0.5;
-				} else
-				if (wall_side < 0) {
-					x += 0.5;
-				}
-				on_wall = false;
-			}
+			}			
 		} else {
 			falling = true;
 		}
-		
-		
 	}
-	private var p:Vec2;
 	
+	private function collideHorizontal( world:World, cdata:CollisionData ) :Void 
+	{
+		aabb = getBounds();	
+		aabb.height -= 2; /// this is to prevent snagging
+		
+		if (world.collideAabb( aabb, 0, cdata )) {
+			p = CollisionData.getSmallest(cdata, p);
+			if (p.x != 0) {
+				motion.vx = 0;
+				on_wall = true;
+				if (p.x < 0) {
+					wall_side = -1;
+				} else
+				if (p.x > 0) {
+					wall_side = 1;
+				}
+				x -= p.x;
+			}
+		}
+	}
 	
 	override public function _render( camera:Camera ):Void 
 	{
 		 // set the draw position to be fixed to the bottom center
-		mc.x = Math.round(x - camera.x);
-		mc.y = Math.round(y - camera.y) - HEIGHT;
+		mc.x = x - camera.x;
+		mc.y = y - camera.y - HEIGHT;
 	}
 	
 	override private function get_visible():Bool 

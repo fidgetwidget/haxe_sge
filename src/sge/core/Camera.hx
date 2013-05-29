@@ -16,7 +16,7 @@ import sge.physics.CollisionMath;
  * @author fidgetwidget
  */
 
- // TODO: need to add handling for world bounds (prevent the camera bounds from going out of bounds)
+ // TODO: change the way following works - follow entities, not Points - change the target types
  // TODO: create additional Camera types - eg. top down zelda camera (room based)
  // TODO: add elements that allow for camera effects (shake, etc)
  
@@ -42,6 +42,8 @@ class Camera
 	public var center(get_center, never) :Vec2;
 	public var x(get_x, set_x):Float;
 	public var y(get_y, set_y):Float;
+	public var ix(get_ix, never):Int;
+	public var iy(get_iy, never):Int;
 	public var cx(get_cx, set_cx):Float;
 	public var cy(get_cy, set_cy):Float;
 	public var width(get_width, set_width):Float;
@@ -200,6 +202,8 @@ class Camera
 	private function get_center() :Vec2				{ return bounds.center; }
 	private function get_x() :Float 				{ return bounds.left; }
 	private function get_y() :Float 				{ return bounds.top; }
+	private function get_ix() :Int					{ return Std.int(bounds.left); }
+	private function get_iy() :Int					{ return Std.int(bounds.top); }
 	private function get_cx() :Float 				{ return bounds.cx; }
 	private function get_cy() :Float 				{ return bounds.cy; }
 	private function get_width() :Float				{ return bounds.width; }

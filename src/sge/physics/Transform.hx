@@ -2,6 +2,7 @@ package sge.physics;
 
 import nme.geom.Matrix;
 import nme.geom.Point;
+import sge.interfaces.IRecyclable;
 
 /**
  * Transform 
@@ -14,16 +15,8 @@ import nme.geom.Point;
  * scale:		x, y scale values relative to its parent.
  * @author fidgetwidget
  */
-
-typedef TransformData = {
-	x:Float, y:Float, 
-	z:Float,
-	rotation:Float,
-	scaleX:Float, 
-	scaleY:Float
-}
  
-class Transform 
+class Transform implements IRecyclable
 {
 	
 	/*
@@ -120,9 +113,11 @@ class Transform
 	private function set_scale( s:Vec2 ) :Vec2 { return _s = s; }
 	
 	
-	/// IRecyclable
+	/*
+	 * IRecycleable 
+	 */
 	public function free() :Void 
-	{
+	{		
 		_p.x = 0;
 		_p.y = 0;
 		_s.x = 0;
@@ -131,20 +126,8 @@ class Transform
 		
 		_free = true;
 	}
-	public function isFree() :Bool 
-	{
-		return _free;
-	}
-	public function use() :Void 
-	{
-		_free = false;
-	}
-	private var _free:Bool;
-	
-	
-	public static inline function make(t:TransformData) : Transform 
-	{
-		return new Transform(t.x, t.y, t.z, t.rotation, t.scaleX, t.scaleY);
-	}
+	public function get_free() :Bool { return _free; }
+	public function set_free( free:Bool ) :Bool { return _free = free; }
+	private var _free:Bool = false;
 	
 }

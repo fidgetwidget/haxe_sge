@@ -85,40 +85,13 @@ class Motion implements IRecyclable
 	}
 	
 	
-	
-	/**
-	 * Apply the motion to the given transform
-	 * @param	t
-	 * @param	delta
-	 * @param	updateSelf
-	 * @return
-	 */
-	public function apply( t:Transform, delta:Float = 1, updateSelf:Bool = true ) :Transform 
+	/// Apply the motion data to the given transform
+	/// NOTE: set transform to null to JUST update the motion data (apply the acceleration and friction)
+	public function apply( t:Transform, delta:Float ) :Transform 
 	{
 		if (delta < 0 || Math.isNaN(delta)) { return t; }
 		
-		if (max_v != 0 && _v.x != 0 && _v.y != 0)
-		{
-			if (_v.x * _v.x + _v.y * _v.y > max_v * max_v) {
-				_v.normalize();
-				_v.scale(max_v);
-			}
-		}
-		
-		if (updateSelf) {
-			_updateSelf( delta * 0.5 );
-		}		
-		
-		if (max_r != 0 && vr != 0) 
-		{
-			if ( vr > max_r ) { 
-				vr = max_r;
-			} 
-			else
-			if ( vr < -max_r ) {
-				vr = -max_r;
-			}
-		}
+		_update( delta * 0.5 );		
 		
 		// allow for self update only
 		if (t != null) {
@@ -127,15 +100,14 @@ class Motion implements IRecyclable
 			t.rotation += vr * delta;
 		}
 		
-		if (updateSelf) {
-			_updateSelf( delta * 0.5 );
-		}
+		_update( delta * 0.5 );
 		
 		return t;
 	}
 	
-	private function _updateSelf( delta:Float ) :Void 
-	{
+	private function _update( delta:Float ) :Void {
+		
+		// apply acceleration and friction values
 		if (_a.y != 0 || _a.x != 0) {
 			_v.x += _a.x * delta;
 			_v.y += _a.y * delta;
@@ -156,6 +128,25 @@ class Motion implements IRecyclable
 			vr -= vr * fr * delta;
 		}		
 		if (vr < 1 && vr > -1) { vr = 0; }
+		
+		// keep velocities between maximums
+		if (max_v != 0 && _v.x != 0 && _v.y != 0)
+		{
+			if (_v.x * _v.x + _v.y * _v.y > max_v * max_v) {
+				_v.normalize();
+				_v.scale(max_v);
+			}
+		}		
+		if (max_r != 0 && vr != 0) 
+		{
+			if ( vr > max_r ) { 
+				vr = max_r;
+			} 
+			else
+			if ( vr < -max_r ) {
+				vr = -max_r;
+			}
+		}
 	}
 	
 	

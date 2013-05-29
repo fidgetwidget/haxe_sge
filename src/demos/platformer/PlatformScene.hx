@@ -97,7 +97,7 @@ class PlatformScene extends Scene
 		
 		// FOR THE DEMO PURPOSES
 		
-		camera.followTarget( player.transform.position, Camera.TARGET_TIGHT, Linear.easeNone );
+		camera.followTarget( player.transform.position );
 		_playerPaused = false;
 		player.paused = false;
 		
@@ -228,7 +228,6 @@ class PlatformScene extends Scene
 	
 	override private function _update(delta:Float):Void 
 	{
-		camera.update(delta);
 		
 		if (!_playerPaused) {
 			player.update(delta);
@@ -252,10 +251,10 @@ class PlatformScene extends Scene
 		}
 		
 		//world.drawDebug(camera);	// don't draw this for the demo
-		//player.render(camera);	// use the current bounds instead for now...
+		player.render(camera);	// use the current bounds instead for now...
 		
-		Draw.graphics.lineStyle(0.5, 0xff0000);
-		Draw.debug_drawAABB( player.getBounds(), camera );
+		//Draw.graphics.lineStyle(0.5, 0xff0000);
+		//Draw.debug_drawAABB( player.getBounds(), camera );
 		
 	}
 	
