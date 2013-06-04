@@ -112,11 +112,19 @@ class Motion implements IRecyclable
 			_v.x += _a.x * delta;
 			_v.y += _a.y * delta;
 		}
-		else 
-		if (_vf.x != 0 || _vf.y != 0) {
-			_v.x -= _v.x * _vf.x;
-			_v.y -= _v.y * _vf.y;
-		}		
+		if (_vf.x != 0 && _v.x != 0) {	
+			if (_v.x > 0)
+				_v.x -= Math.abs(_v.x) * _vf.x;
+			else 
+				_v.x += Math.abs(_v.x) * _vf.x;
+		}
+		if (_vf.y != 0 && _v.y != 0) {
+			if (_v.y > 0)
+				_v.y -= Math.abs(_v.y) * _vf.y;
+			else 
+				_v.y += Math.abs(_v.y) * _vf.y;
+		}
+			
 		if (_v.x < 1 && _v.x > -1) { _v.x = 0; }
 		if (_v.y < 1 && _v.y > -1) { _v.y = 0; }
 		

@@ -9,6 +9,7 @@ import sge.graphics.AssetManager;
 import sge.graphics.Tileset;
 import sge.physics.BoxCollider;
 import sge.physics.Collider;
+import sge.physics.TileCollider;
 
 /**
  * TileData
@@ -47,8 +48,8 @@ class TileData
 		collisionData = [];
 		
 		_box = new Box(tileWidth * 0.5, tileHeight * 0.5, tileWidth, tileHeight);
-		_boxCollider = new BoxCollider(_box);
-		_boxCollider.useCenterPosition = false;
+		_collider = new TileCollider(_box);
+		_collider.useCenterPosition = false;
 		
 		tileset.init(tileWidth, tileHeight, Std.int(tileset.source.width / tileWidth), Std.int(tileset.source.height / tileHeight));
 		for (i in 1...tileTypeCount) {
@@ -63,7 +64,7 @@ class TileData
 	
 	
 	/// get a colllider for the given tileIndex at the given position
-	public function getCollider( tileIndex:Int, x:Float, y:Float ) :Collider
+	public function getCollider( tileIndex:Int, dir:Int, x:Float, y:Float ) :Collider
 	{
 		switch (collisionData[tileIndex]) {
 			case EMPTY_TILE:
@@ -71,14 +72,15 @@ class TileData
 			case SOLID_TILE:
 				_box.x = x;
 				_box.y = y;
-				return _boxCollider;
+				_collider.directions = dir;
+				return _collider;
 		}
 		
 		// fall back
 		return null;
 	}
 	private var _box:Box;
-	private var _boxCollider:BoxCollider;
+	private var _collider:TileCollider;
 	
 	
 	private function get_bitmapData() :BitmapData { return tileset.source; }

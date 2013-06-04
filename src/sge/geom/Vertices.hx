@@ -92,8 +92,8 @@ class Vertices
 	// add a line to the end of the line list
 	public function add_LineSegment( seg:LineSegment ) :Int
 	{
-		_verts.push( seg.start );
-		return _verts.push( seg.end );
+		_verts.push( seg.a );
+		return _verts.push( seg.b );
 	}
 	
 	
@@ -105,12 +105,12 @@ class Vertices
 				switch ( position ) 
 				{
 					case POSITION_BEFORE:
-						_verts.insert(i, seg.end);
-						_verts.insert(i, seg.start);
+						_verts.insert(i, seg.b);
+						_verts.insert(i, seg.a);
 						break;
 					case POSITION_AFTER:
-						_verts.insert(i + 1, seg.end);
-						_verts.insert(i + 1, seg.start);
+						_verts.insert(i + 1, seg.b);
+						_verts.insert(i + 1, seg.a);
 						break;
 				}
 				return;

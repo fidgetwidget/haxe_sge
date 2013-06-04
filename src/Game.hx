@@ -43,17 +43,17 @@ class Game extends Engine {
 		
 		super.init();
 		
-		_physicsScene = new PhysicsTestScene();
-		this.addScene(_physicsScene);
-		
-		_pongScene = new PongScene();
-		this.addScene(_pongScene);
-		
-		_cameraScene = new CameraTestScene();
-		this.addScene(_cameraScene);
-		
-		_brickBreakerScene = new BreakerScene();
-		this.addScene(_brickBreakerScene);
+		//_physicsScene = new PhysicsTestScene();
+		//this.addScene(_physicsScene);
+		//
+		//_pongScene = new PongScene();
+		//this.addScene(_pongScene);
+		//
+		//_cameraScene = new CameraTestScene();
+		//this.addScene(_cameraScene);
+		//
+		//_brickBreakerScene = new BreakerScene();
+		//this.addScene(_brickBreakerScene);
 		
 		//_platformerScene = new PlatformScene();
 		//this.addScene(_platformerScene, true);

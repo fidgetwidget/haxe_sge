@@ -12,6 +12,7 @@ import sge.physics.AABB;
 import sge.physics.Collider;
 import sge.physics.CollisionData;
 import sge.physics.CollisionMath;
+import sge.physics.TileCollider;
 
 #if (!js)
 import sge.core.Debug;
@@ -194,6 +195,25 @@ class World
 		layers[layer][index].setTile(r, c, tile);
 	}
 	
+	// TODO: make this STORED data for each tile
+	private function getTileDirections( r:Int, c:Int, layer:Int = 0 ) :Int {
+		dir = 0;
+		if (getTile(r - 1, c, layer) == 0) {
+			dir |= TileCollider.UP;
+		}
+		if (getTile(r + 1, c, layer) == 0) {
+			dir |= TileCollider.DOWN;
+		}
+		if (getTile(r, c - 1, layer) == 0) {
+			dir |= TileCollider.LEFT;
+		}
+		if (getTile(r, c + 1, layer) == 0) {
+			dir |= TileCollider.RIGHT;
+		}
+		return dir;
+	}
+	private var dir:Int;
+	
 	/*
 	 * Render Functions
 	 */	
@@ -292,13 +312,12 @@ class World
 		}
 		
 		Draw.graphics.lineStyle(0.5, 0x0000FF);
-		var collider:Collider;
 		rr = _r;
 		cc = _c;
 		while (rr <= mr) {
 			while (cc <= mc) {
 				if (getTile(rr, cc, 0) != 0) {
-					collider = tileData.getCollider(1, cc * cell_width, rr * cell_height);
+					collider = tileData.getCollider(1, TileCollider.ALL, cc * cell_width, rr * cell_height);
 					Draw.debug_drawAABB(collider.getBounds(), camera);
 				}
 				cc++;
@@ -320,7 +339,8 @@ class World
 		_c = get_col( x );
 		var tileIndex = getTile(_r, _c, layer);
 		if (tileIndex != 0) { // change this in the future
-			var collider = tileData.getCollider(tileIndex, _c * cell_width, _r * cell_height);
+			directions = getTileDirections(_r, _c, layer);
+			collider = tileData.getCollider(tileIndex, directions, _c * cell_width, _r * cell_height);
 			return collider.collidePoint(x, y, cdata);
 		}
 		return false;
@@ -361,18 +381,21 @@ class World
 		return collides;
 	}
 	
+	/// TODO: change this so that it only collides on "exposed" edges (and not connected edges)
 	private function collideTile( r:Int, c:Int, aabb:AABB, layer:Int, cdata:CollisionData ) :Bool 
 	{
 		var tileIndex = getTile(r, c, layer);
 		if (tileIndex != 0) { // change this in the future
-			var collider = tileData.getCollider(tileIndex, c * cell_width, r * cell_height);
+			directions = getTileDirections(r, c, layer);
+			collider = tileData.getCollider(tileIndex, directions, c * cell_width, r * cell_height);
 			return collider.collideAABB(aabb, cdata);
 		}
 		
 		return false;
 	}
 	
-	
+	private var collider:Collider;
+	private var directions:Int;
 	
 	/*
 	 * Helper Functions

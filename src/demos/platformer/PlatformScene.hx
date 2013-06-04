@@ -102,20 +102,18 @@ class PlatformScene extends Scene
 		player.paused = false;
 		
 #if (!js) 
-		Debug.registerVariable(camera, "x", "cam_x", true);
-		Debug.registerVariable(camera, "y", "cam_y", true);
+		//Debug.registerVariable(camera, "x", "cam_x", true);
+		//Debug.registerVariable(camera, "y", "cam_y", true);
 		
-		Debug.registerVariable(player, "x", "player_x", true);
-		Debug.registerVariable(player, "y", "player_y", true);
-		Debug.registerVariable(player.motion, "vx", "player_mx", true);
-		Debug.registerVariable(player.motion, "vy", "player_my", true);
-		
-		Debug.registerVariable(player, "wall_side", "player_wall_side", true);
+		//Debug.registerVariable(player, "x", "player_x", true);
+		//Debug.registerVariable(player, "y", "player_y", true);
+		//Debug.registerFunction(player, "wallCheck", "onwall", true);
+		//Debug.registerFunction(player, "floorCheck", "onground", true);
  
-		Debug.registerFunction(this, "getRow", "row", true);
-		Debug.registerFunction(this, "getCol", "col", true);
-		Debug.registerFunction(this, "getChunkRow", "c_row", true);
-		Debug.registerFunction(this, "getChunkCol", "c_col", true);
+		//Debug.registerFunction(this, "getRow", "row", true);
+		//Debug.registerFunction(this, "getCol", "col", true);
+		//Debug.registerFunction(this, "getChunkRow", "c_row", true);
+		//Debug.registerFunction(this, "getChunkCol", "c_col", true);
 #end
 	}	
 	
@@ -251,10 +249,10 @@ class PlatformScene extends Scene
 		}
 		
 		//world.drawDebug(camera);	// don't draw this for the demo
-		player.render(camera);	// use the current bounds instead for now...
+		//player.render(camera);	// use the current bounds instead for now...
 		
-		//Draw.graphics.lineStyle(0.5, 0xff0000);
-		//Draw.debug_drawAABB( player.getBounds(), camera );
+		Draw.graphics.lineStyle(0.5, 0xff0000);
+		Draw.debug_drawAABB( player.getBounds(), camera );
 		
 	}
 	

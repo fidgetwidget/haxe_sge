@@ -13,48 +13,48 @@ import sge.physics.Vec2;
 class LineSegment
 {
 	
-	public var startX(getStartX, setStartX):Float;
-	public var startY(getStartY, setStartY):Float;
-	public var endX(getEndX, setEndX):Float;
-	public var endY(getEndY, setEndY):Float;
+	public var ax(get_ax, set_ax):Float;
+	public var ay(get_ay, set_ay):Float;
+	public var bx(get_bx, set_bx):Float;
+	public var by(get_by, set_by):Float;
 	
-	public var start(getStart, setStart):Vec2;
-	public var end(getEnd, setEnd):Vec2;
+	public var a(get_a, set_a):Vec2;
+	public var b(get_b, set_b):Vec2;
 
 	public function new() 
 	{
-		_start = new Vec2();
-		_end = new Vec2();
+		_a = new Vec2();
+		_b = new Vec2();
 	}
 	
-	public function setPoints( startX:Float, startY:Float, endX:Float, endY:Float ) :Void 
+	public function setPoints( ax:Float, ay:Float, bx:Float, by:Float ) :Void 
 	{
-		_start.x = startX;
-		_start.y = startY;
-		_end.x = endX;
-		_end.y = endY;
+		_a.x = ax;
+		_a.y = ay;
+		_b.x = bx;
+		_b.y = by;
 	}
 	
 	public function draw( graphics:Graphics ) :Void {
-		graphics.moveTo(startX, startY);
-		graphics.lineTo(endX, endY);
+		graphics.moveTo(ax, ay);
+		graphics.lineTo(bx, by);
 	}
 	
-	private function getStartX():Float { return _start.x;  }
-	private function setStartX(x:Float):Float { _start.x = x; return _start.x;  }
-	private function getStartY():Float { return _start.y;  }
-	private function setStartY(y:Float):Float { _start.y = y; return _start.y;  }
-	private function getEndX():Float { return _end.x;  }
-	private function setEndX(x:Float):Float { _end.x = x; return _end.x;  }
-	private function getEndY():Float { return _end.y;  }
-	private function setEndY(y:Float):Float { _end.y = y; return _end.y;  }
+	private function get_ax():Float 		{ return _a.x;  }
+	private function set_ax(x:Float):Float 	{ _a.x = x; return _a.x;  }
+	private function get_ay():Float 		{ return _a.y;  }
+	private function set_ay(y:Float):Float 	{ _a.y = y; return _a.y;  }
+	private function get_bx():Float 			{ return _b.x;  }
+	private function set_bx(x:Float):Float 	{ _b.x = x; return _b.x;  }
+	private function get_by():Float 			{ return _b.y;  }
+	private function set_by(y:Float):Float 	{ _b.y = y; return _b.y;  }
 	
-	private function getStart():Vec2 { return _start;  }
-	private function setStart(s:Vec2):Vec2 { _start.x = s.x; _start.y = s.y; return _start;  }
-	private function getEnd():Vec2 { return _end;  }
-	private function setEnd(e:Vec2):Vec2 { _end.x = e.x; _end.y = e.y; return _end;  }
+	private function get_a():Vec2 			{ return _a;  }
+	private function set_a(s:Vec2):Vec2 	{ _a.x = s.x; _a.y = s.y; return _a;  }
+	private function get_b():Vec2 			{ return _b;  }
+	private function set_b(e:Vec2):Vec2 		{ _b.x = e.x; _b.y = e.y; return _b;  }
 	
-	private var _start:Vec2;
-	private var _end:Vec2;
+	private var _a:Vec2;
+	private var _b:Vec2;
 	
 }

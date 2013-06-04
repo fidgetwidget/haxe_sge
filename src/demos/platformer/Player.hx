@@ -18,6 +18,9 @@ import sge.physics.Vec2;
 import sge.random.Random;
 import sge.world.World;
 
+#if (!js) 
+import sge.core.Debug;
+#end
 
 /**
  * ...
@@ -27,13 +30,13 @@ import sge.world.World;
 class Player extends Entity
 {
 	private static var WIDTH:Int = 16;
-	private static var HEIGHT:Int = 40;	
-	private static var JUMP_HEIGHT:Int = 36;
+	private static var HEIGHT:Int = 38;	
+	private static var JUMP_HEIGHT:Int = 35;
 	private static var CROUCH_HEIGHT:Int = 32;
 	private static var SPEED:Float = 450;
 	private static var RUN_SPEED:Float = 600;
 	private static var CROUCH_SPEED:Float = 200;
-	private static var JUMP_THRUST:Float = 3000;
+	private static var JUMP_THRUST:Float = 2750;
 	private static var FALL_SPEED:Float = 1000;
 	private static var FALL_FRICTION:Float = 0.01;
 	private static var WALK_FRICTION:Float = 0.0333;
@@ -59,6 +62,7 @@ class Player extends Entity
 	 */
 	private var jumpspeed:Float;
 	private var cur_jumpTime:Float = 0;
+	private var updateShape:Bool = false;
 	
 	private var _madeVisible:Bool = false;
 	private var _shape:Shape;
@@ -87,7 +91,18 @@ class Player extends Entity
 		
 		motion.fx = WALK_FRICTION;
 		motion.fy = FALL_FRICTION;
+		p = new Vec2();
 		
+		//Debug.registerVariable(p, "x", "p_x", true);
+		//Debug.registerVariable(p, "y", "p_y", true);
+		Debug.registerVariable(motion, "vx", "p_vx", true);
+		Debug.registerVariable(motion, "vy", "p_vy", true);		
+		Debug.registerVariable(motion, "fx", "p_fx", true);
+		Debug.registerVariable(motion, "fy", "p_fy", true);
+		Debug.registerVariable(motion, "ax", "p_ax", true);
+		Debug.registerVariable(motion, "ay", "p_ay", true);
+		Debug.registerVariable(this, "falling", "p_falling", true);
+		Debug.registerVariable(this, "on_wall", "p_onwall", true);
 	}
 	
 	override public function update(delta:Float):Void 
@@ -133,12 +148,17 @@ class Player extends Entity
 		if ( !Input.isKeyDown(Keyboard.W) && !Input.isKeyDown(Keyboard.UP) ) {
 			jumping = false;
 			jumpspeed = 0;
-			falling = true;
 		} 
 		
 		if ( Input.isKeyDown(Keyboard.S) || Input.isKeyDown(Keyboard.DOWN) ) {
+			if (!crouching) {
+				updateShape = true;
+			}
 			crouching = true;
 		} else {
+			if (crouching) {
+				updateShape = true;
+			}
 			crouching = false;
 		}
 		
@@ -176,9 +196,6 @@ class Player extends Entity
 			}
 		}
 		
-		
-		
-		
 	}
 
 	override private function _update( delta:Float ):Void 
@@ -194,7 +211,7 @@ class Player extends Entity
 			jumping = false; 
 		}				
 		
-		if (falling) {			
+		if (falling) {
 			// falling motion
 			if (on_wall && motion.vy > 0 && !crouching) {
 				// when on the wall (and not crouching), fall slower
@@ -210,7 +227,7 @@ class Player extends Entity
 			_box.height = CROUCH_HEIGHT;
 			_box.y = -CROUCH_HEIGHT * 0.5;
 		} else 
-		if (jumpspeed > 0) {
+		if (jumpspeed > 0 || on_wall) {
 			_box.height = JUMP_HEIGHT;
 			_box.y = -JUMP_HEIGHT * 0.5;
 		} else {
@@ -234,77 +251,55 @@ class Player extends Entity
 			motion.fx = WALK_FRICTION;
 		}
 		
-		
 	}	
 	
-	public function doWorldCollisions( world:World, cdata:CollisionData ) :Void {
-		if (p == null) {
-			p = new Vec2();
-		}
+	public function doWorldCollisions( world:World, cdata:CollisionData ) :Void 
+	{
 		p.x = 0;
 		p.y = 0;
 		
-		if ( Math.abs(motion.vx) > Math.abs(motion.vy) || falling ) {
-			collideVertical( world, cdata );
-			collideHorizontal( world, cdata );
-		} else {			
-			collideHorizontal( world, cdata );
-			collideVertical( world, cdata );
-		}
+		// test for world(tile) collisions & resolve them
+		_collideWorld( world, cdata );	
+		
+		// update wall and ground checks
+		on_wall = wallCheck() && motion.vy >= 0;
+		falling = !floorCheck();
 		
 	}
 	private var p:Vec2;
 	private var aabb:AABB;
 	
-	private function collideVertical( world:World, cdata:CollisionData ) :Void 
+	private function _collideWorld( world:World, cdata:CollisionData ) :Void 
 	{
 		aabb = getBounds();
-		aabb.width -= 2; /// this is to prevent snagging
-		
-		// do top/bottom collision
-		if (world.collideAabb( aabb, 0, cdata )) {
-			p = CollisionData.getSmallest(cdata, p);			
-			if (p.y != 0) {
-				motion.vy = 0;
-				
-				if (p.y > 0) {
-					falling = false;
-					// prevent on wall and on ground at the same time
-					if (on_wall) {				
-						on_wall = false;
-						wall_side = 0;
-					}
-				} else {
+		tests = 0;
+		while (world.collideAabb( aabb, 0, cdata ) && tests < MAX_TESTS) {
+			
+			p = CollisionData.getSmallest(cdata, p);
+			
+			// Resolve the collision (smallest first)
+			if ( p.y != 0 && ( (Math.abs(p.y) < Math.abs(p.x)) || p.x == 0 ) ) {
+				motion.vy = 0;				
+				if (p.y < 0) {
 					// if we hit our head, set falling to true (but keep jumping)
-					falling = true; 
+					falling = true;
 				}
 				y -= p.y;
-			}			
-		} else {
-			falling = true;
-		}
-	}
-	
-	private function collideHorizontal( world:World, cdata:CollisionData ) :Void 
-	{
-		aabb = getBounds();	
-		aabb.height -= 2; /// this is to prevent snagging
-		
-		if (world.collideAabb( aabb, 0, cdata )) {
-			p = CollisionData.getSmallest(cdata, p);
-			if (p.x != 0) {
+				trace("py = " + p.y);
+			} else 
+			if ( p.x != 0 && ( (Math.abs(p.x) < Math.abs(p.y)) || p.y == 0 ) ) {
 				motion.vx = 0;
-				on_wall = true;
-				if (p.x < 0) {
-					wall_side = -1;
-				} else
-				if (p.x > 0) {
-					wall_side = 1;
-				}
-				x -= p.x;
-			}
+				x -= p.x;				
+				trace("px = " + p.x);
+			}	
+			// get new bounds for next test			
+			aabb = getBounds();
+			// update for fallback exit (prevent infinite looping)
+			tests++;
 		}
 	}
+	var tests:Int = 0;
+	var MAX_TESTS:Int = 3;
 	
 	override public function _render( camera:Camera ):Void 
 	{
@@ -324,12 +319,65 @@ class Player extends Entity
 		
 		if (mc == null) { return; }		
 		if (_shape.graphics == null) { return; }
-		
+		aabb = getBounds();
 		_shape.graphics.clear();		
 		_shape.graphics.lineStyle(1, 0x2332CF);
-		_shape.graphics.drawRect(0, 0, WIDTH, HEIGHT);
+		_shape.graphics.drawRect(0, 0, _box.width, _box.height);
 		
 		_madeVisible = true;
+	}
+	
+	
+	// TODO: make the wall and floor check private
+	
+	public function wallCheck( exitOnFloorTests:Bool = true ) :Bool {
+		
+		aabb = getBounds();
+		// TODO: change this to be a line check from top to middle of each side
+		
+		// prevent on wall in the corner scenarios
+		if (exitOnFloorTests && world.collidePoint(aabb.cx, aabb.bottom + 1)) {
+			return false;
+		}
+		
+		// check middle first
+		if (world.collidePoint(aabb.left - 1, aabb.cy)) {
+			wall_side = -1;
+			return true;
+		} else
+		if (world.collidePoint(aabb.right + 1, aabb.cy)) {
+			wall_side = 1;
+			return true;
+		}		
+		// also check upper part
+		if (world.collidePoint(aabb.left - 1, aabb.top - 1)) {
+			wall_side = -1;
+			return true;
+		} else 
+		if (world.collidePoint(aabb.right + 1, aabb.top - 1)) {
+			wall_side = 1;
+			return true;
+		}
+		
+		
+		return false;
+	}
+	
+	public function floorCheck() :Bool {
+		
+		aabb = getBounds();		
+		// check center first (will be true in most true cases)
+		if (world.collidePoint(aabb.cx, aabb.bottom + 1)) {
+			return true;
+		}
+		// then check near the sides
+		if (world.collidePoint(aabb.left + 0.5, aabb.bottom + 1) ||
+		world.collidePoint(aabb.right - 0.5, aabb.bottom + 1)) {
+			return true;
+		}
+		
+		// we aren't on the ground
+		return false;
 	}
 	
 	

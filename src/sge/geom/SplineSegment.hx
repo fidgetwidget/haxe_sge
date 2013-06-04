@@ -69,19 +69,19 @@ class SplineSegment extends LineSegment
 			resetSpline(); 
 		}
 		
-		_verts.add(_start);
+		_verts.add(a);
 		for (p in _pointsBetween)
 		{
 			_verts.add(p);
 		}
-		_verts.add(end);
+		_verts.add(b);
 		
 		return _verts;
 	}
 	
 	public override function draw( graphics:Graphics ) :Void {
 		
-		graphics.moveTo(startX, startY);
+		graphics.moveTo(ax, ay);
 		
 		// if we are using the points at all, we need to make sure they are correct
 		if (_changed)
@@ -91,16 +91,16 @@ class SplineSegment extends LineSegment
 			graphics.lineTo(p.x, p.y);
 		}
 		
-		graphics.lineTo(endX, endY);
+		graphics.lineTo(bx, by);
 	}
 	
 	private function resetSpline() {
 		
 		_pointsBetween.clear(); // TODO: will need to change when pooling Point objects is added...
 		
-		smoothSpline( _start.x, _start.y, _end.x, _end.y,
-			(_prev == null ? _start.x : _prev.x), (_prev == null ? _start.y : _prev.y),
-			(_next == null ? _end.x : _next.x), (_next == null ? _end.y : _next.y) );
+		smoothSpline( ax, ay, bx, by,
+			(_prev == null ? ax : _prev.x), (_prev == null ? ay : _prev.y),
+			(_next == null ? bx : _next.x), (_next == null ? by : _next.y) );
 			
 		_changed = false;
 	}
