@@ -1,32 +1,30 @@
 package sge.world;
 
-import sge.geom.Vertices;
-
 /**
- * Region
- * a collection of Cells belonging to a World for a single layer
- * 
- * TODO: change cells to store more than just an Int
- * TODO: make loading and unloading regions easier/better for dynamicly loaded worlds
+ * ...
  * @author fidgetwidget
  */
-
-class Region 
-{		
+class Region
+{
+	
 	/*
 	 * Properties
 	 */
-	public var x(default, null):Int;
+	public var x(default, null):Int;	// Positional Offset
 	public var y(default, null):Int;
-	public var cells:Array<Int>;
+	public var cells:Array<Tile>;
+	
 	public var world:World;
-	public var layer:Int;
-	public var isDirty(default, null):Bool = false;
-	public var isSaving(default, null):Bool = false;	
+	public var layer:Int;				// World Layer
 	
-	private var _tileData(get_tileData, never):TileData;
-	private var _tileEdges:Vertices; // not yet used
+	public var isDirty(default, null):Bool;
+	public var isSaving(default, null):Bool;
 	
+	/*
+	 * Members 
+	 */
+	
+
 	/**
 	 * Constructor
 	 * @param	x
@@ -35,102 +33,105 @@ class Region
 	public function new( x:Int, y:Int, layer:Int, world:World ) 
 	{
 		cells = [];
+		set( x, y, layer, world );
+	}
+	
+	// Set values for recycled regions
+	public function set( x:Int, y:Int, layer:Int, world:World ) :Void {	
+		
 		this.x = x;
 		this.y = y;
 		this.layer = layer;
 		this.world = world;
+		
+		isDirty = false;
+		isSaving = false;
+		
 		resetTiles();
 	}
 	
-	public function free() :Void {
-		x = 0;
-		y = 0;
-		layer = 0;
-		//tiles.splice(0, tiles.length);
+	public function load() :Void {
+		// TODO: set the tiles from a file.
 	}
 	
-	public function set( x:Int, y:Int, layer:Int ) :Void {
-		this.x = x;
-		this.y = y;
-		this.layer = layer;
-	}
-	
-	/**
-	 * It uses the world bitmap data, and the current offset position to set the tiles from that source.
-	 */
-	public function setTiles() :Void {
-		//TODO: set the tiles array using bitmap data in the world.
-	}
-	/**
-	 * Writes the current state of the region to the world bitmap data
-	 */
 	public function save() :Void {
-		isDirty = false;
-		isSaving = true;
-		// TODO: start writing the data to the file
-		// and when its done, set isSaving to false
+		// TODO: save the region state to a file.
 	}
 	
 	public function resetTiles() :Void {
-		for (r in 0...World.region_rows) {
-			for (c in 0...World.region_cols) {
-				setTile(r, c, 0);
+		for (r in 0...world.REGION_ROWS) {
+			for (c in 0...world.REGION_COLS) {
+				setTile(r, c, Tile.EMPTY);
 			}
 		}
 	}
 	
 	/*
-	 * get and set via row and column
+	 * Get & Set Tiles
 	 */
 	
 	// returns the fixed index of the row and column passed
-	public function setTile( r:Int, c:Int, tile:Int ) :Int {
+	public function setTile( r:Int, c:Int, tile:Tile ) :Int {
 		var index = get_index(r, c);
 		cells[index] = tile;
 		isDirty = true;
 		return index;
 	}
 	
-	public function getTile( r:Int, c:Int ) :Int {
+	public function getTile( r:Int, c:Int ) :Tile {
 		var index = get_index(r, c);
 		return cells[index];
 	}
 	
-	/*
-	 * get and set via world position
-	 */
-	public function setTileAt( x:Float, y:Float, tile:Int ) :Int {
+	public function setTileAt( x:Float, y:Float, tile:Tile ) :Int {
 		if (check_bounds( x, y )) {
-			var r = Math.floor( (y - this.y) / World.cell_height);
-			var c = Math.floor( (x - this.x) / World.cell_width);
+			var r = Math.floor( (y - this.y) / world.CELL_HEIGHT);
+			var c = Math.floor( (x - this.x) / world.CELL_WIDTH);
 			return setTile( r, c, tile );
 		}
-		return -1;
+		return -1; // not set
 	}
 	
-	public function getTileAt( x:Float, y:Float ) :Int {
+	public function getTileAt( x:Float, y:Float ) :Tile {
 		if (check_bounds( x, y )) {
-			var r = Math.floor( (y - this.y) / World.cell_height);
-			var c = Math.floor( (x - this.x) / World.cell_width);
+			var r = Math.floor( (y - this.y) / world.CELL_HEIGHT);
+			var c = Math.floor( (x - this.x) / world.CELL_WIDTH);
 			return getTile( r, c );
 		}
-		return -1;
+		return null;
 	}
-	
 	
 	/*
 	 * Helper Functions
 	 */
-	inline function check_bounds( x:Float, y:Float ) :Bool {
+	private inline function check_bounds( x:Float, y:Float ) :Bool {
 		return ( 
-		 ( x > this.x && x < this.x + World.region_width ) && 
-		 ( y > this.y && y < this.y + World.region_height ) );
+		 ( x > this.x && x < this.x + world.REGION_WIDTH ) && 
+		 ( y > this.y && y < this.y + world.REGION_HEIGHT ) );
 	}
 	
-	inline function get_index( r:Int, c:Int ) :Int 			{ return c + (r * World.region_rows); }
-	inline function get_index_at( x:Float, y:Float ) :Int 	{ return get_index( get_row(y), get_col(x) ); }
-	inline function get_row( y:Float ) :Int 				{ return Math.floor( y / World.cell_height ); }
-	inline function get_col( x:Float ) :Int 				{ return Math.floor( x / World.cell_width ); }
+	private inline function get_index( r:Int, c:Int ) :Int 			{ return c + (r * world.REGION_ROWS); }
+	private inline function get_index_at( x:Float, y:Float ) :Int 	{ return get_index( get_row(y), get_col(x) ); }
+	private inline function get_row( y:Float ) :Int 				{ return Math.floor( y / world.CELL_HEIGHT ); }
+	private inline function get_col( x:Float ) :Int 				{ return Math.floor( x / world.CELL_WIDTH ); }	
 	
-	inline function get_tileData() :TileData 				{ return world.tileData; }
+	
+	/*
+	 * IRecycleable 
+	 */
+	public function free() :Void 
+	{		
+		// TODO: clear the cells
+		x = 0;
+		y = 0;
+		layer = 0;
+		world = null;
+		isDirty = false;
+		isSaving = false;
+		_free = true;
+	}
+	public function get_free() :Bool { return _free; }
+	public function set_free( free:Bool ) :Bool { return _free = free; }
+	private var _free:Bool = false;
+	
 }

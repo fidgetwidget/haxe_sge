@@ -1,8 +1,9 @@
 package sge.geom;
 
-import nme.display.Graphics;
+import flash.display.Graphics;
 
-import sge.physics.AABB;
+import sge.collision.AABB;
+import sge.graphics.Camera;
 
 /**
  * ...
@@ -29,24 +30,28 @@ class Box extends Shape {
 		this.height = height;
 	}
 	
-	public override function free() :Void 
+	override public function free() :Void 
 	{
 		super.free();
 		width = 0;
 		height = 0;
 	}
 	
-	public override function inBounds(x:Float, y:Float) :Bool 
-	{		
-		if (x < this.x || x > this.x + width) { return false; }
-		if (y < this.y || y > this.y + height) { return false; }
-		return true;
+	/// Draw the transformed version of the Shape
+	override public function draw( graphics:Graphics, camera:Camera = null ) :Void 
+	{
+		if (camera == null) 
+			graphics.drawRect(ix, iy, width, height);
+		else 
+			graphics.drawRect(ix - camera.ix, iy - camera.iy, width, height);
 	}
 	
-	/// Draw the transformed version of the Shape
-	public override function draw( graphics:Graphics ) :Void 
-	{		
-		graphics.drawRect(x, y, width, height);
+	override public function get_bounds():AABB 
+	{
+		if (_bounds == null) 
+			_bounds = new AABB();
+		_bounds.setRect(x, y, width, height);
+		return _bounds;
 	}
 	
 }

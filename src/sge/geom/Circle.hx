@@ -1,18 +1,19 @@
 package sge.geom;
 
-import nme.display.Graphics;
-import sge.physics.Transform;
+import flash.display.Graphics;
+
+import sge.collision.AABB;
+import sge.graphics.Camera;
 
 /**
  * ...
  * @author fidgetwidget
  */
-
 class Circle extends Shape
 {
 
 	public var radius:Float;
-	public var transformedRadius(get_transformedRadius, never):Float;
+	public var transformedRadius(get, never):Float;
 	
 	/**
 	 * Constructor
@@ -26,33 +27,35 @@ class Circle extends Shape
 		this.radius = radius;
 	}
 	
-	public override function free() :Void 
+	override public function free() :Void 
 	{
 		super.free();
 		radius = 0;
 	}
 	
-	public override function inBounds(x:Float, y:Float) :Bool 
-	{		
-		dx = this.x - x;
-		dy = this.y - y;
-		return (dx * dx + dy * dy) <= (radius * radius);
-	}
-	private var dx:Float;
-	private var dy:Float;
-	
 	/// Draw the transformed version of the Shape
-	public override function draw( graphics:Graphics ) :Void 
+	override public function draw( graphics:Graphics, camera:Camera = null ) :Void 
 	{		
-		graphics.drawCircle(x, y, radius * scaleX);
+		if (camera == null)
+			graphics.drawCircle(ix, iy, radius * scaleX);
+		else
+			graphics.drawCircle(ix - camera.ix, iy - camera.iy, radius * scaleX);
+	}
+	
+	override public function get_bounds():AABB 
+	{
+		if (_bounds == null) 
+			_bounds = new AABB();		
+		_bounds.set_centerHalfs(x, y, radius , radius);
+		return _bounds;
 	}
 	
 	/*
 	 * Circle Shape Property Changes 
 	 */
 	/// Scale will effect BOTH horizontal and vertical for circles
-	private override function set_scaleX( x:Float ) :Float { _isTransformed = false; _transform.scaleX = x; return _transform.scaleY = x; }
-	private override function set_scaleY( y:Float ) :Float { _isTransformed = false; _transform.scaleX = y; return _transform.scaleY = y; }
+	override private function set_scaleX( x:Float ) :Float { _isTransformed = false; _transform.scaleX = x; return _transform.scaleY = x; }
+	override private function set_scaleY( y:Float ) :Float { _isTransformed = false; _transform.scaleX = y; return _transform.scaleY = y; }
 	
 	private function get_transformedRadius() :Float { return radius * _transform.scaleX; }
 }

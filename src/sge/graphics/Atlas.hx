@@ -1,13 +1,14 @@
 package sge.graphics;
 
-import nme.display.DisplayObjectContainer;
-import nme.display.DisplayObject;
-import nme.display.Sprite;
+import flash.display.DisplayObjectContainer;
+import flash.display.DisplayObject;
+import flash.display.Sprite;
+import haxe.ds.IntMap;
+
 import sge.core.Engine;
 
 /**
- * A Managed Sprite Layering System
- * 
+ * A Managed Sprite Layering System 
  * @author fidgetwidget
  */
 
@@ -17,18 +18,19 @@ class Atlas
 	/*
 	 * Properties & Members
 	 */
-	public var atlases:IntHash<Sprite>;
-	private var atlas_root:DisplayObjectContainer;
-	public var layers(get_layers, never):Int;
+	public var atlases:IntMap<Sprite>;	
+	public var layers(get, never):Int;
 	
-	private var _count:Int = 0;
+	private var atlas_root:DisplayObjectContainer;
+	private var _count:Int = 0;		
 	
 	/*
 	 * Initializer
 	 */
-	public function new() {
-		atlases = new IntHash();
-		atlas_root = new Sprite();
+	public function new() 
+	{		
+		atlases = new IntMap();
+		atlas_root = new Sprite();	
 		Engine.root.addChild(atlas_root);
 	}
 	
@@ -75,6 +77,10 @@ class Atlas
 		atlases.get( layer ).removeChild( mc );
 	}
 	
+	/*
+	 * Display Functions 
+	 */
+	
 	public function hideAll() :Void {
 		atlas_root.visible = false;
 	}
@@ -98,7 +104,9 @@ class Atlas
 		atlases.get( layer ).visible = true;
 	}
 	
-	
+	/*
+	 * Getters & Setters
+	 */
 	private function get_layers() :Int {
 		return _count;
 	}

@@ -1,8 +1,9 @@
 package sge.graphics;
 
-import nme.display.BitmapData;
-import nme.Assets;
-import nme.display.Tilesheet;
+import flash.display.BitmapData;
+import haxe.ds.StringMap;
+import openfl.Assets;
+import openfl.display.Tilesheet;
 
 /**
  * ...
@@ -11,11 +12,17 @@ import nme.display.Tilesheet;
 
 class AssetManager 
 {
+	
+	/*
+	 * Members
+	 */
+	private static var _images:StringMap<BitmapData>;
+	private static var _tilesheets:StringMap<Tilesheet>;
 
 	public static function init() :Void {
 		
-		_images = new Hash<BitmapData>();
-		_tilesheets = new Hash<Tilesheet>();
+		_images = new StringMap<BitmapData>();
+		_tilesheets = new StringMap<Tilesheet>();
 	}
 	
 	public static function saveBitmap( source:Dynamic ) :Bool {
@@ -51,11 +58,5 @@ class AssetManager
 		
 		return data;
 	}
-	
-	// Asset hash table
-	private static var _images:Hash<BitmapData>;
-	
-	// TODO: store tilesheets for bitmaps too?
-	private static var _tilesheets:Hash<Tilesheet>;
 	
 }

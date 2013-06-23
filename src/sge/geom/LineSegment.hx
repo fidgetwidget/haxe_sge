@@ -1,60 +1,70 @@
 package sge.geom;
 
-import nme.display.Graphics;
-import nme.geom.Point;
-
-import sge.physics.Vec2;
+import flash.geom.Point;
+import sge.math.Vector2D;
 
 /**
  * ...
  * @author fidgetwidget
  */
-
 class LineSegment
 {
 	
-	public var ax(get_ax, set_ax):Float;
-	public var ay(get_ay, set_ay):Float;
-	public var bx(get_bx, set_bx):Float;
-	public var by(get_by, set_by):Float;
+	/*
+	 * Properties
+	 */
+	public var start				: Vector2D;
+	public var sx(get, set)			: Float;
+	public var sy(get, set)			: Float;
+	public var end					: Vector2D;
+	public var ex(get, set)			: Float;
+	public var ey(get, set)			: Float;
+	public var length(get, never)	: Float;
 	
-	public var a(get_a, set_a):Vec2;
-	public var b(get_b, set_b):Vec2;
 
-	public function new() 
+	public function new( sx:Float, sy:Float, ex:Float, ey:Float ) 
 	{
-		_a = new Vec2();
-		_b = new Vec2();
+		start = new Vector2D();
+		end = new Vector2D();
+		set( sx, sy, ex, ey );
 	}
 	
-	public function setPoints( ax:Float, ay:Float, bx:Float, by:Float ) :Void 
+	public function set( sx:Float, sy:Float, ex:Float, ey:Float ) :Void 
 	{
-		_a.x = ax;
-		_a.y = ay;
-		_b.x = bx;
-		_b.y = by;
+		start.x = sx;
+		start.y = sy;
+		end.x = ex;
+		end.y = ey;
 	}
 	
-	public function draw( graphics:Graphics ) :Void {
-		graphics.moveTo(ax, ay);
-		graphics.lineTo(bx, by);
+	public function draw( graphics:Graphics ) :Void 
+	{
+		graphics.moveTo(start.x, start.y);
+		graphics.lineTo(end.x, end.y);
 	}
 	
-	private function get_ax():Float 		{ return _a.x;  }
-	private function set_ax(x:Float):Float 	{ _a.x = x; return _a.x;  }
-	private function get_ay():Float 		{ return _a.y;  }
-	private function set_ay(y:Float):Float 	{ _a.y = y; return _a.y;  }
-	private function get_bx():Float 			{ return _b.x;  }
-	private function set_bx(x:Float):Float 	{ _b.x = x; return _b.x;  }
-	private function get_by():Float 			{ return _b.y;  }
-	private function set_by(y:Float):Float 	{ _b.y = y; return _b.y;  }
 	
-	private function get_a():Vec2 			{ return _a;  }
-	private function set_a(s:Vec2):Vec2 	{ _a.x = s.x; _a.y = s.y; return _a;  }
-	private function get_b():Vec2 			{ return _b;  }
-	private function set_b(e:Vec2):Vec2 		{ _b.x = e.x; _b.y = e.y; return _b;  }
+	/*
+	 * Getters & Setters
+	 */
 	
-	private var _a:Vec2;
-	private var _b:Vec2;
+	private function get_sx() :Float { return start.x; }
+	private function get_sy() :Float { return start.y; }
+	private function get_ex() :Float { return end.x; }
+	private function get_ey() :Float { return end.y; }
+	
+	private function set_sx( x:Float ) :Float { return start.x = x; }
+	private function set_sy( y:Float ) :Float { return start.y = y; }
+	private function set_ex( x:Float ) :Float { return end.x = x; }
+	private function set_ey( y:Float ) :Float { return end.y = y; }
+	
+	private function get_length() :Float
+	{
+		_dx = end.x - start.x;
+		_dy = end.y - start.y;
+		return Math.sqrt(_dx * _dx + _dy * _dy);
+	}
+	private var _dx:Float;
+	private var _dy:Float;
 	
 }

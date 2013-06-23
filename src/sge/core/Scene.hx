@@ -1,18 +1,19 @@
 package sge.core;
 
-import nme.display.Graphics;
-import nme.geom.Point;
-import haxe.FastList;
-import sge.interfaces.IRecyclable;
+import flash.display.Graphics;
+import flash.geom.Point;
+import sge.math.Vector2D;
 
+import sge.lib.IRecyclable;
 import sge.graphics.Atlas;
+import sge.graphics.Camera;
 import sge.graphics.Draw;
 
+
 /**
- * 
+ * ...
  * @author fidgetwidget
  */
-
 class Scene implements IRecyclable
 {
 	
@@ -21,32 +22,28 @@ class Scene implements IRecyclable
 	 */
 	public var id:String;
 	public var parent:Scene;
-	public var camera:Camera;	
-	public var offset(get_offset, set_offset) :Point;
+	public var camera:Camera;
 	public var atlas:Atlas;
+	public var entities:EntityManager;
+	
+	public var offset(get, set) :Vector2D;	
+	public var count(get, null):Int;
 	
 	public var visible:Bool;	
 	public var active:Bool;	
-	public var ending:Bool;
-	
-	public var inTransition(get_inTransition, never):Bool;
-	public var transitionValue(get_transitionValue, never):Float;	
+	public var ending:Bool;	
 	
 	public var transitionOnTime:Float;
 	public var transitionOffTime:Float;
+	public var inTransition(get, never):Bool;
+	public var transitionValue(get, never):Float;
 	
-	
-	public var on_Exit:Dynamic;
-	
-	public var entities:EntityManager;
-	public var count(get_count,null):Int;
-	
-	
+	public var on_Exit:Dynamic;	
 	
 	/*
 	 * Members 
 	 */
-	private var _offset:Point;
+	private var _offset:Vector2D;
 	private var transitionTime:Float;
 		
 	/**
@@ -69,6 +66,10 @@ class Scene implements IRecyclable
 	 */
 	public function exit() :Void 
 	{
+		if (atlas != null) {
+			atlas.hideAll();
+		}
+		
 		ending = true;
 		transitionTime = transitionOffTime;
 	}
@@ -86,9 +87,7 @@ class Scene implements IRecyclable
 	}
 	
 	// Called just prior to finally exiting.
-	private function _exit() :Void {
-		
-	}
+	private function _exit() :Void { }
 	
 	///  Update and Render
 	public function update( delta:Float ) :Void 
@@ -99,6 +98,8 @@ class Scene implements IRecyclable
 		_update( delta );
 		_postUpdate( delta );		
 	}
+	
+	
 	private function _updateTransition( delta:Float ) :Void 
 	{
 		
@@ -114,13 +115,15 @@ class Scene implements IRecyclable
 			}
 		}
 	}
+	
 	private function _handleInput( delta:Float ) :Void 
 	{
 		/// Each Scene can have their own input handling
 		/// You can also put this logic in the Entities
 	}
+	
 	private function _update( delta:Float ) :Void 
-	{
+	{		
 		if (entities == null) { return; }
 		for (e in entities) 
 		{
@@ -130,7 +133,8 @@ class Scene implements IRecyclable
 	}	
 	private function _postUpdate( delta:Float ) :Void 
 	{
-		camera.update(delta); // always update the camera last
+		if (camera != null)
+			camera.update(delta); // always update the camera last
 		
 		if (on_Exit != null && ending && transitionTime == 0)
 		{ 
@@ -142,12 +146,11 @@ class Scene implements IRecyclable
 		}
 	}
 	
-	
 	public function render() :Void
 	{
 		if (entities == null) { return; }
-		for (e in entities) 
-		{
+		
+		for (e in entities) {
 			e.render( camera );
 		}
 	}
@@ -161,24 +164,21 @@ class Scene implements IRecyclable
 		entities.add( e );
 	}
 	
-	public function remove( e:Entity, ?free:Bool = false ) :Bool {
-		
+	public function remove( e:Entity, ?free:Bool = false ) :Void {
 		entities.remove(e, free);
-		return true;
 	}
 	
 	
 	///  Getters and Setters
 	private function get_count() :Int	{ return entities.count; }
 	
-	private function get_offset() :Point { 
+	private function get_offset() :Vector2D { 
 		if (parent != null) {
-			var o = _offset.clone();
-			return o.add(parent.offset);
+			return Vector2D.add(_offset.clone(), parent.offset);
 		}
 		return _offset;
 	}
-	private function set_offset( p:Point ) :Point 
+	private function set_offset( p:Vector2D ) :Vector2D 
 	{ 
 		// set the local value given the world value (TODO: either make this the standard behaviour everywhere, or change this)
 		if (parent != null) {

@@ -1,29 +1,30 @@
 package sge.core;
 
-import com.eclecticdesignstudio.motion.Actuate;
-import nme.display.DisplayObject;
-import sge.interfaces.IRecyclable;
-import sge.physics.CollisionData;
-import sge.physics.CollisionResolver;
+import flash.display.DisplayObject;
+import motion.Actuate;
 
-import sge.physics.Transform;
-import sge.physics.Motion;
-import sge.physics.AABB;
-import sge.physics.Collider;
-import sge.interfaces.IHasBounds;
-import sge.interfaces.IHasId;
+import sge.collision.AABB;
+import sge.collision.CollisionData;
+import sge.collision.CollisionResolver;
+import sge.collision.Collider;
+import sge.lib.IRecyclable;
+import sge.lib.IHasBounds;
+import sge.lib.IHasId;
+import sge.math.Transform;
+import sge.math.Motion;
+
 
 /**
  * The basic type of object in a game
  * @author fidgetwidget
  */
 
-class Entity implements IHasBounds, implements IHasId, implements IRecyclable
+class Entity implements IHasBounds //, implements IHasId, implements IRecyclable <-- flashdevelop is throwing an error for some reason????
 {
 
 	public static inline var DYNAMIC	:Int = 1;
 	public static inline var STATIC		:Int = 2;
-	public static inline var FIXED		:Int = 4;	
+	public static inline var FIXED		:Int = 4;
 	
 	/*
 	 * Properties
@@ -36,11 +37,11 @@ class Entity implements IHasBounds, implements IHasId, implements IRecyclable
 	public var y(get_y, set_y):Float;
 	public var ix(get_ix, set_ix):Int;
 	public var iy(get_iy, set_iy):Int;
-	public var rotation(get_r, set_r):Float;
-	public var scaleX(get_sx, set_sx):Float;
-	public var scaleY(get_sy, set_sy):Float;
-	public var transform(get_t, set_t):Transform;
-	public var motion(get_m, set_m):Motion;
+	public var rotation(get_rotation, set_rotation):Float;
+	public var scaleX(get_scaleX, set_scaleX):Float;
+	public var scaleY(get_scaleY, set_scaleY):Float;
+	public var transform(get_transform, set_transform):Transform;
+	public var motion(get_motion, set_motion):Motion;
 	
 	public var visible(get_visible, set_visible):Bool;
 	public var active(get_active, set_active):Bool;
@@ -152,44 +153,44 @@ class Entity implements IHasBounds, implements IHasId, implements IRecyclable
 	/*
 	 * Getters & Setters
 	 */
-	private function get_x() :Float 			{ return (parent == null) ? _t.x : _t.x + parent.x; }
-	private function get_y() :Float 			{ return (parent == null) ? _t.y : _t.y + parent.y; }
-	private function get_ix() :Int				{ return (parent == null) ? _t.ix : _t.ix + parent.ix; }
-	private function get_iy() :Int				{ return (parent == null) ? _t.iy : _t.iy + parent.iy; }
-	private function get_r() :Float 			{ return (parent == null) ? _t.rotation : _t.rotation + parent.rotation; }
-	private function get_sx() :Float 			{ return (parent == null) ? _t.scaleX : _t.scaleX + parent.scaleX; }
-	private function get_sy() :Float			{ return (parent == null) ? _t.scaleY : _t.scaleY + parent.scaleY; }
+	private function get_x() 						:Float 		{ return (parent == null) ? _t.x : _t.x + parent.x; }
+	private function get_y() 						:Float 		{ return (parent == null) ? _t.y : _t.y + parent.y; }
+	private function get_ix() 						:Int		{ return (parent == null) ? _t.ix : _t.ix + parent.ix; }
+	private function get_iy() 						:Int		{ return (parent == null) ? _t.iy : _t.iy + parent.iy; }
+	private function get_rotation() 				:Float 		{ return (parent == null) ? _t.rotation : _t.rotation + parent.rotation; }
+	private function get_scaleX() 					:Float 		{ return (parent == null) ? _t.scaleX : _t.scaleX + parent.scaleX; }
+	private function get_scaleY() 					:Float		{ return (parent == null) ? _t.scaleY : _t.scaleY + parent.scaleY; }
 		
-	private function set_x( x:Float ) :Float 	{ return _t.x = (parent == null) ? x : x - parent.x; }
-	private function set_y( y:Float ) :Float 	{ return _t.y = (parent == null) ? y : y - parent.y; }
-	private function set_ix( x:Int ) :Int		{ return _t.ix = (parent == null) ? x : x - parent.ix; }
-	private function set_iy( y:Int ) :Int		{ return _t.iy = (parent == null) ? y : y - parent.iy; }
-	private function set_r( r:Float ) :Float 	{ return _t.rotation = (parent == null) ? r : r - parent.rotation; }
-	private function set_sx( sx:Float ) :Float 	{ return _t.scaleX = (parent == null) ? sx : sx - parent.scaleX; }
-	private function set_sy( sy:Float ) :Float 	{ return _t.scaleY = (parent == null) ? sy : sy - parent.scaleY; }
+	private function set_x( x:Float ) 				:Float 		{ return _t.x = (parent == null) ? x : x - parent.x; }
+	private function set_y( y:Float ) 				:Float 		{ return _t.y = (parent == null) ? y : y - parent.y; }
+	private function set_ix( x:Int ) 				:Int		{ return _t.ix = (parent == null) ? x : x - parent.ix; }
+	private function set_iy( y:Int ) 				:Int		{ return _t.iy = (parent == null) ? y : y - parent.iy; }
+	private function set_rotation( r:Float ) 		:Float 		{ return _t.rotation = (parent == null) ? r : r - parent.rotation; }
+	private function set_scaleX( sx:Float ) 		:Float 		{ return _t.scaleX = (parent == null) ? sx : sx - parent.scaleX; }
+	private function set_scaleY( sy:Float ) 		:Float 		{ return _t.scaleY = (parent == null) ? sy : sy - parent.scaleY; }
 	
-	private function get_t() :Transform 				{ return _t; }
-	private function get_m() :Motion 					{ return _m; }
-	private function set_t( t:Transform ) :Transform 	{ return _t = t; }
-	private function set_m( m:Motion ) :Motion 			{ return _m = m; }
+	private function get_transform() 				:Transform 	{ return _t; }
+	private function get_motion()					:Motion		{ return _m; }
+	private function set_transform( t:Transform ) 	:Transform 	{ return _t = t; }
+	private function set_motion( m:Motion )			:Motion		{ return _m = m; }
 	
-	private function get_visible() :Bool 				{ return _visible; }
-	private function set_visible( visible:Bool ) :Bool 	{ return _visible = visible; }
+	private function get_visible() 					:Bool 		{ return _visible; }
+	private function set_visible( visible:Bool ) 	:Bool 		{ return _visible = visible; }
 	
-	private function get_active() :Bool 				{ return _active; }
-	private function set_active( active:Bool ) :Bool 	{ return _active = active; }
+	private function get_active() 					:Bool 		{ return _active; }
+	private function set_active( active:Bool ) 		:Bool 		{ return _active = active; }
 	
 	
 	
 	/*
 	 * IHasBounds 
 	 */
-	public function getBounds() :AABB
+	public function get_bounds() :AABB
 	{
 		if (collider == null)  
 			return null; 
 		else
-			return collider.getBounds();
+			return collider.get_bounds();
 	}
 	/*
 	 * IHasId 
