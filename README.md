@@ -1,9 +1,13 @@
 haxe_sge
 ========
 
-small galaxy engine in haxe+nme
+small galaxy engine in haxe using openfl
 
-currently uses gconsole (http://haxe.org/com/libs/gconsole) for debug menu features
-- install instructions on that site
+includes (currently) 3 demos:
 
+1 [test1]          a simple shape drawing test scene.
+
+2 [test2]          a simple collision test scene.
+
+3 [platformTest]   a platform physics test scene.
 
