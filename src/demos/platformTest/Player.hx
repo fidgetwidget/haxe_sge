@@ -370,6 +370,7 @@ class Player extends Entity
 		// set the draw position to be fixed to the bottom center
 		//mc.x = x - camera.x;
 		//mc.y = y - camera.y - HEIGHT;
+		// don't draw the shape right now, the bounding box is better
 		mc.x = -1000;
 		mc.y = -1000;
 		

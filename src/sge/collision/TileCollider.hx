@@ -141,14 +141,18 @@ class TileCollider extends BoxCollider
 				if (cdata.oV == -1) {
 					cdata.oV = 1;
 					cdata.py = Math.abs(cdata.py - height); // flip the value
+					#if (debug)
 					trace("py flipped");
+					#end
 				}
 			} else
 			if (directions & DOWN != 0) {
 				if (cdata.oV == 1) {
 					cdata.oV = -1;
 					cdata.py = Math.abs(cdata.py - height); // flip the value
+					#if (debug)
 					trace("py flipped");
+					#end
 				}
 			} else {
 				cdata.oV = 0;
@@ -163,14 +167,18 @@ class TileCollider extends BoxCollider
 				if (cdata.oH == 1) {
 					cdata.oH = -1;
 					cdata.px = Math.abs(cdata.px - width); // flip the value
+					#if (debug)
 					trace("px flipped");
+					#end
 				}
 			} else
 			if (directions & RIGHT != 0) {
 				if (cdata.oH == -1) {
 					cdata.oH = 1;
 					cdata.px = Math.abs(cdata.px - width); // flip the value
+					#if (debug)
 					trace("px flipped");
+					#end
 				}
 			} else {
 				cdata.oH = 0;
@@ -184,14 +192,18 @@ class TileCollider extends BoxCollider
 				if (cdata.oV == -1) {
 					cdata.oV = 1;
 					cdata.py = Math.abs(cdata.py - height); // flip the value
+					#if (debug)
 					trace("py flipped");
+					#end
 				}
 			} else
 			if (directions & DOWN != 0) {
 				if (cdata.oV == 1) {
 					cdata.oV = -1;
 					cdata.py = Math.abs(cdata.py - height); // flip the value
+					#if (debug)
 					trace("py flipped");
+					#end
 				}
 			} else {
 				cdata.oV = 0;
@@ -202,14 +214,18 @@ class TileCollider extends BoxCollider
 				if (cdata.oH == 1) {
 					cdata.oH = -1;
 					cdata.px = Math.abs(cdata.px - width); // flip the value
+					#if (debug)
 					trace("px flipped");
+					#end
 				}
 			} else
 			if (directions & RIGHT != 0) {
 				if (cdata.oH == -1) {
 					cdata.oH = 1;
 					cdata.px = Math.abs(cdata.px - width); // flip the value
+					#if (debug)
 					trace("px flipped");
+					#end
 				}
 			} else {
 				cdata.oH = 0;
