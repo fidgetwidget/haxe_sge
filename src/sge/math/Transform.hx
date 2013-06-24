@@ -50,7 +50,7 @@ class Transform implements IRecyclable
 	private var _transformed:Bool = false;
 	private var _m:Matrix;
 	
-	public function new( x:Float = 0, y:Float = 0, z:Float = 1, rotation:Float = 0, scale_x:Float = 1, scale_y:Float = 1 ) 
+	public function new( x:Float = 0, y:Float = 0, z:Float = 0, rotation:Float = 0, scale_x:Float = 1, scale_y:Float = 1 ) 
 	{
 		_p = new Vector2D();
 		_s = new Vector2D();
@@ -59,7 +59,7 @@ class Transform implements IRecyclable
 		set(x, y, z, rotation, scale_x, scale_y);
 	}
 	
-	public function set( x:Float = 0, y:Float = 0, z:Float = 1, rotation:Float = 0, scale_x:Float = 1, scale_y:Float = 1 ) :Void {
+	public function set( x:Float = 0, y:Float = 0, z:Float = 0, rotation:Float = 0, scale_x:Float = 1, scale_y:Float = 1 ) :Void {
 		
 		// Position
 		_p.x = x;
@@ -123,6 +123,8 @@ class Transform implements IRecyclable
 		_p.y = 0;
 		_s.x = 0;
 		_s.y = 0;
+		_z = 0;
+		_r = 0;
 		_m.identity();
 		
 		_free = true;

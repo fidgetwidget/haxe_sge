@@ -42,6 +42,9 @@ class TestScene extends Scene
 	var moveCamera:Bool = false;
 	
 	var mc:Sprite;
+	var bg:Sprite;
+	var mg:Sprite;
+	var fg:Sprite;
 	
 
 	public function new() 
@@ -74,6 +77,10 @@ class TestScene extends Scene
 		
 		mc = atlas.makeLayer(0);
 		
+		bg = atlas.makeLayer(1);
+		mg = atlas.makeLayer(2);
+		fg = atlas.makeLayer(3);
+		
 		var d:Int;
 		var x:Float;
 		var y:Float;
@@ -92,7 +99,14 @@ class TestScene extends Scene
 			shape.motion.vy = v.y;
 			shape.motion.velocity.scale( Random.instance.between(10, 50) );
 			add(shape);
-			mc.addChild( shape.mc );
+			if (shape.transform.z < 0) {
+				bg.addChild( shape.mc );
+			} else
+			if (shape.transform.z > 0) {
+				fg.addChild( shape.mc );
+			} else {
+				mg.addChild( shape.mc );
+			}
 		}
 		
 	}
@@ -207,6 +221,9 @@ class TestScene extends Scene
 			}				
 			
 		}
+		
+		Draw.graphics.lineStyle(1, 0x000000 );
+		Draw.debug_drawAABB( tree.root, camera );
 	}
 	private var quad:AABB;
 	

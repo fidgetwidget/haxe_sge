@@ -65,7 +65,8 @@ class Engine
 	
 	public function new() {		
 		
-		_fps = new FPS();		
+		_fps = new FPS(10, 10, 0xCC1243 );	
+		
 		properties = new Properties();
 	}
 	
@@ -92,6 +93,7 @@ class Engine
 		_stage.addEventListener( Event.DEACTIVATE, function(_) _pause() );
 		
 		_stage.addChild( _fps );		
+		
 		_stage.addEventListener(Event.ENTER_FRAME, function(_) update());
 	}
 	

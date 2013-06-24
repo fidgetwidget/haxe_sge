@@ -346,35 +346,33 @@ class QuadNode extends AABB
 		_itt_index = 0;
 		_itt_curChild = 0;
 		_itt_result = null;
-		
 		if (_devided) {
 			for (child in children)
 			{
 				child.iterator();
 			}
-		}
+		}		
 		
 		return this;
 	}
 	
 	public function hasNext() :Bool
-	{
-		if (_items != null && _items.length > _itt_index) {
+	{		
+		
+		if ( _items != null && _items.length > _itt_index ) {
 			return true;
 		} else
-		if (children == null) {
-			return false;
-		}
+		if ( children != null ) {
 		
-		while (children.length > _itt_curChild) {
-			
-			if (children[_itt_curChild] != null && children[_itt_curChild].hasNext()) {
-				return true; 
-			} else {
-				_itt_curChild++;
-			}			
-		}
-		
+			while ( children.length > _itt_curChild ) {
+				
+				if ( children[_itt_curChild] != null && children[_itt_curChild].hasNext() ) {
+					return true; 
+				} else {
+					_itt_curChild++;
+				}			
+			}				
+		}		
 		return false;
 		
 	}
@@ -382,30 +380,28 @@ class QuadNode extends AABB
 	public function next() :Entity
 	{
 		// do we have any items in this quad?
-		if (_items != null && _items.length > _itt_index)
+		if ( _items != null && _items.length > _itt_index )
 		{
 			_itt_result = _items[_itt_index];
 			_itt_index++;
 			return _itt_result;
 		} else
-		if (children == null) {
-			return null;
+		if ( children != null ) {
+			
+			// do we have any children that have items?
+			while (children.length > _itt_curChild) {
+				// test the current child for an item
+				if (children[_itt_curChild] != null && children[_itt_curChild].hasNext()) 
+				{ 
+					return children[_itt_curChild].next();
+				}
+				_itt_curChild++;
+			}	
+			
 		}
 		
-		// do we have any children that have items?
-		while (children.length > _itt_curChild) {
-			// test the current child for an item
-			if (children[_itt_curChild] != null && children[_itt_curChild].hasNext()) 
-			{ 
-				return children[_itt_curChild].next();
-			}
-			_itt_curChild++;
-		}		
-		
-		// if nothing else worked, we are out of items
 		return null;
 	}
-	
 	private var _itt_index:Int = 0;
 	private var _itt_curChild:Int = 0;
 	private var _itt_result:Entity;

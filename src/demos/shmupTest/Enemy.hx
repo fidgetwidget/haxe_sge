@@ -1,4 +1,4 @@
-package demos.test1;
+package demos.shmupTest;
 
 import flash.Lib;
 import flash.display.Graphics;
@@ -23,13 +23,14 @@ import sge.collision.AABB;
  * ...
  * @author fidgetwidget
  */
-class ShapeEntity extends Entity
+class Enemy extends Entity
 {
 	
 	private var _aabb		:AABB;
 	private var _geom		:sge.geom.Shape; // TWO Shape classes... hrm... maybe I should rename my Shape to Geom?
 	private var _shape		:Shape;
 	private var SIZE		:Float = 8;
+	private var hits		:Int = 3;
 	private var _isCircle	:Bool = false;
 	private var _isBox		:Bool = false;
 	private var _isPoly		:Bool = false;
@@ -38,7 +39,7 @@ class ShapeEntity extends Entity
 	public function new() 
 	{
 		super();
-		className = Type.getClassName(ShapeEntity);
+		className = Type.getClassName(Enemy);
 		
 		_visible = true;
 		_active = true;
@@ -55,33 +56,36 @@ class ShapeEntity extends Entity
 		if (dieRoll < 2) {
 			var poly = sge.geom.Shape.makePolygon( 0, 0, SIZE, Math.floor(Random.instance.between(5, 9)) );
 			_geom = poly;
-			collider = new PolygonCollider(poly, this);
 			_isPoly = true;
-			transform.z = -0.25;
 		} else
 		if (dieRoll < 4) {
 			var circle = sge.geom.Shape.makeCircle(0, 0, SIZE);
 			_geom = circle;
-			collider = new CircleCollider( circle, this );
 			_isCircle = true;
-			transform.z = 0;
 		} else {
-			var box = sge.geom.Shape.makeBox(0, 0, SIZE * 2, SIZE * 2);
+			var box = sge.geom.Shape.makeBox(-SIZE, -SIZE, SIZE * 2, SIZE * 2);
 			_geom = box;
-			collider = new BoxCollider(box, this, false);	
 			_isBox = true;
-			transform.z = 0.25;
 		}
+		_aabb = new AABB();
+		_aabb.set_centerHalfs(0, 0, SIZE, SIZE);
 		
 	}
 	
 	override public function _render( camera:Camera ) : Void 
 	{		
-		_aabb = get_bounds();
-		mc.x = (_aabb.cx - camera.ix) - (transform.z * (camera.cx - _aabb.cx)); // add the paralax offset
-		mc.y = (_aabb.cy - camera.iy) - (transform.z * (camera.cy - _aabb.cy));
+		_aabb.cx = ix;
+		_aabb.cy = iy;
+		mc.x = (_aabb.cx - camera.ix); // add the paralax offset
+		mc.y = (_aabb.cy - camera.iy);
 	}
 	
+	override public function get_bounds():AABB 
+	{
+		_aabb.cx = ix;
+		_aabb.cy = iy;
+		return _aabb;
+	}
 	
 	override private function get_visible() : Bool 
 	{
@@ -114,5 +118,61 @@ class ShapeEntity extends Entity
 		_shape.graphics.endFill();
 		
 		madeVisible = true;
+	}
+	
+	private function _initMotion() : Void
+	{
+		if (_m == null) {
+			_m = new Motion();
+		}
+		
+		_m.vy = 50;
+		if (_isBox) {
+			_m.vy = 80;
+		} else
+		if (_isCircle) {
+			_m.vy = 50;
+		} else 
+		if (_isPoly) {
+			_m.vy = 20;
+		}
+		
+		_m.fx = 0;
+		_m.fy = 0;
+	}
+	
+	private function _initHealth() : Void 
+	{
+		hits = 3;
+		if (_isBox) {
+			hits = 2;
+		} else
+		if (_isCircle) {
+			hits = 3;
+		} else 
+		if (_isPoly) {
+			hits = 5;
+		}
+	}
+	
+	public function hit() :Bool
+	{
+		hits--;
+		if (hits <= 0) {
+			return true;
+		}
+		return false;
+	}
+	
+	
+	public static function makeEnemy( x:Float, y:Float ) :Enemy 
+	{
+		var enemy = Engine.getEntity( Enemy );
+		enemy.x = x;
+		enemy.y = y;
+		enemy._initMotion();
+		enemy._initHealth();
+		enemy.makeVisible();
+		return enemy;
 	}
 }

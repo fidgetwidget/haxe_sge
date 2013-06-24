@@ -39,11 +39,11 @@ class Path extends Vertices
 	public function new( points:Array<Point> = null ) 
 	{
 		super(points);
-		_ev = new Vec2();
+		_ev = new Vector2D();
 		_current = null;
 	}
 	
-	public function move( delta:Float, speed:Float ) :Vec2 {
+	public function move( delta:Float, speed:Float ) :Vector2D {
 		
 		if (_current == null) {
 			if (_verts.length == 0) 
