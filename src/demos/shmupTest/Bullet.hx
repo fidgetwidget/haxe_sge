@@ -72,7 +72,7 @@ class Bullet extends Entity
 		_shape.graphics.clear();
 		_shape.graphics.lineStyle( 2, 0x00FF00 );
 		_shape.graphics.moveTo(0, 0);
-		_shape.graphics.lineTo(0, -_radius);
+		_shape.graphics.lineTo(0, -_radius);		
 		
 		madeVisible = true;
 	}

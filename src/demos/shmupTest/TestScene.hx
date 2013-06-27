@@ -19,6 +19,8 @@ import sge.math.Dice;
 import sge.math.Random;
 import sge.geom.Path;
 
+import sge.graphics.Emitter;
+
 /**
  * Draw a number of basic shapes in a space, and allow dragging of the scene
  * @author fidgetwidget
@@ -30,7 +32,6 @@ class TestScene extends Scene
 	static var TREE_HEIGHT:Int = 1200;
 	static var SHOT_DELAY:Float = 0.33;
 	static var SPAWN_DELAY:Float = 1;
-	static var STAR_COUNT:Int = 500;
 	
 	static var LEFT_LIMIT:Int = 300;
 	static var RIGHT_LIMIT:Int = 900;
@@ -45,7 +46,7 @@ class TestScene extends Scene
 	var tree:EntityTree;
 	
 	var player:Player;
-	var stars:List<Star>;
+	var stars:Stars;
 	var bullets:List<Bullet>;
 	var shotDelay:Float;
 	var spawnDelay:Float;
@@ -65,7 +66,7 @@ class TestScene extends Scene
 		// Setup the Entity Manager
 		tree = new EntityTree(TREE_WIDTH, TREE_HEIGHT);
 		entities = tree;
-		stars = new List<Star>();
+		stars = new Stars();
 		bullets = new List<Bullet>();
 		
 		// Setup the camera
@@ -101,15 +102,10 @@ class TestScene extends Scene
 		add( player );
 		mg.addChild( player.mc );
 		
-		while (stars.length < STAR_COUNT * 0.5) {		
-			var x = Random.instance.between(tree.root.left + 10, tree.root.right - 10);
-			var y = Random.instance.between(tree.root.top + 10, tree.root.bottom - 10);
-			var z = Random.instance.between(25, 50) * 0.01;
-			var star = Star.makeStar(x, y, -z);
-			stars.add(star);
-			add(star);
-			bg.addChild( star.mc );
-		}	
+		stars.area_width = TREE_WIDTH;
+		stars.area_height = TREE_HEIGHT;
+		stars.start();
+		bg.addChild( stars.mc );
 		
 	}
 	
@@ -128,16 +124,7 @@ class TestScene extends Scene
 	
 	override private function _update( delta:Float ) : Void 
 	{
-		var i = 0;
-		while (stars.length < STAR_COUNT && i++ < 1) {		
-			var x = Random.instance.between(tree.root.left + 10, tree.root.right - 10);
-			var y = tree.root.top + 10;
-			var z = Random.instance.between(25, 50) * 0.01;
-			var star = Star.makeStar(x, y, -z);
-			stars.add(star);
-			add(star);
-			bg.addChild( star.mc );
-		}
+		stars.update( delta );
 		
 		if (shotDelay > 0) {
 			shotDelay -= delta;
@@ -163,10 +150,6 @@ class TestScene extends Scene
 			
 			if (quad == null) {
 				
-				if (e.className == Type.getClassName(Star)) {
-					stars.remove(cast(e, Star));
-					bg.removeChild(e.mc);
-				} else 
 				if (e.className == Type.getClassName(Bullet)) {
 					bullets.remove(cast(e, Bullet));
 					fg.removeChild(e.mc);
@@ -237,13 +220,21 @@ class TestScene extends Scene
 			e.render( camera );	
 		}
 		
+		stars.render( camera );
+		
+		// White wall off the outside areas
+		Draw.graphics.beginFill(0xFFFFFF);
+		Draw.graphics.drawRect(0 - camera.x, 0 - camera.y, LEFT_LIMIT - player.SIZE, TREE_HEIGHT);
+		Draw.graphics.drawRect(RIGHT_LIMIT + player.SIZE - camera.x, 0 - camera.y, LEFT_LIMIT - player.SIZE, TREE_HEIGHT);
+		Draw.graphics.endFill();
+		
 		// Draw the Players Barriers
 		Draw.graphics.lineStyle(1, 0xFF0000);
 		Draw.graphics.moveTo( LEFT_LIMIT - player.SIZE - camera.x, 0 - camera.y);
 		Draw.graphics.lineTo( LEFT_LIMIT - player.SIZE - camera.x, TREE_HEIGHT - camera.y);
 		Draw.graphics.moveTo(RIGHT_LIMIT + player.SIZE - camera.x, 0 - camera.y);
 		Draw.graphics.lineTo(RIGHT_LIMIT + player.SIZE - camera.x, TREE_HEIGHT - camera.y);
-		Draw.graphics.endFill();
+		
 	}
 	private var quad:QuadNode;
 	
