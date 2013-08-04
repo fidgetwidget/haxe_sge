@@ -1,12 +1,12 @@
 package sge.core;
 
-import haxe.ds.IntMap;
-import haxe.ds.StringMap;
+import haxe.FastList;
 
 /**
  * A tool for recycling Entities of any type
  *  NOTE: Right now, Entity types must not have any arguments in their constructor * 
- *  TODO: handle Entity types that have arguments in their constructor * 
+ *  TODO: handle Entity types that have arguments in their constructor
+ * 
  * @author fidgetwidget
  */
 
@@ -15,16 +15,16 @@ class EntityFactory
 	
 	/// Members
 	private static var _entityId:Int = 0;
-	private static var _entities:StringMap<Array<Entity>>;
-	private static var _entTypes:IntMap<String>;
+	private static var _entities:Hash<FastList<Entity>>;
+	private static var _entTypes:IntHash<String>;
 	private static var _typeName:String;
 
 	
 	// init the entities and entityTypes hash tables
 	public static function init() 
 	{
-		_entities = new StringMap<Array<Entity>>();
-		_entTypes = new IntMap<String>();
+		_entities = new Hash<FastList<Entity>>();
+		_entTypes = new IntHash<String>();
 		_entityId = 0;
 	}
 		
@@ -37,13 +37,13 @@ class EntityFactory
 		
 		// if the type is new
 		if ( _entities.get(_typeName) == null ) {
-			_entities.set(_typeName, new Array<Entity>());
+			_entities.set(_typeName, new FastList<Entity>());
 		}		
 		
 		// if there aren't any, then add one.
-		if ( _entities.get(_typeName).length == 0 ) {
+		if ( _entities.get(_typeName).isEmpty() ) {
 			var e = Type.createInstance(type, []);
-			_entities.get(_typeName).push( e );
+			_entities.get(_typeName).add( e );
 		}
 		
 		return cast _entities.get(_typeName).pop();
@@ -57,7 +57,7 @@ class EntityFactory
 		_typeName = Type.getClassName(Type.getClass(e));
 		if ( _entities.exists(_typeName) ) {
 			e.free();
-			_entities.get(_typeName).push(e);
+			_entities.get(_typeName).add(e);
 		} else {
 			e.free();
 		}		

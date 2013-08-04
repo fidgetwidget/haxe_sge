@@ -31,10 +31,6 @@ import sge.graphics.Draw;
 
 using sge.physics.Vec2;
 
-#if (!js)
-import sge.core.Debug;
-#end
-
 /**
  * Temporary catch all scene for testing in...
  * 
@@ -362,6 +358,10 @@ class PhysicsTestScene extends Scene
 	
 	override private function _exit():Void 
 	{
+		var ents:Array = entities.getAllEntities();
+		for (e in ents) {
+			entities.remove(e, true);
+		}
 		
 	}
 	

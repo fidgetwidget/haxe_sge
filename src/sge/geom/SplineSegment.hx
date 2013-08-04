@@ -1,79 +1,59 @@
 package sge.geom;
 
-import sge.math.Vector2D;
+import haxe.FastList;
+import nme.display.Graphics;
+import nme.geom.Point;
+
+import sge.physics.Vec2;
 
 /**
  * ...
  * @author fidgetwidget
  */
+
 class SplineSegment extends LineSegment
 {
 	
-	/*
-	 * Properties 
-	 */
-	public var resolution(null, set):Int;
-	
-	/*
-	 * Members 
-	 */	
-	private var _pointsBetween	: List<Vector2D>;
-	private var _verts			: Vertices;
-	private var _changed		: Bool;	
-	private var _prev			: Vector2D;
-	private var _next			: Vector2D;
-	private var _hermiteValues	: Array<Float>;
-	
-	// Memory Saving Members
-	private var _m1				: { x:Float, y:Float };
-	private var _m2				: { x:Float, y:Float };
-	private var _px				:Float;
-	private var _py				:Float; 
-	private var _t				:Float;
-	private var _i				:Int;	// Index
-	private var _l				:Int;	// Length	
-	private var _h00			:Float;	// Hermite Matrix Values
-	private var _h10			:Float;
-	private var _h01			:Float;
-	private var _h11			:Float;
-	
+	public var resolution(never, setRes):Int;
 
-	public function new( r:Int = 5, prev:Vector2D = null, next:Vector2D = null ) 
+	public function new(res:Int = 5, prev:Vec2 = null, next:Vec2 = null ) 
 	{
 		super();
 		_prev = prev;
 		_next = next;
-		_pointsBetween = new List<Vector2D>();
-		resolution = r;
+		_pointsBetween = new List<Vec2>();
+		resolution = res;
 		_changed = false;
 		_hermiteValues = [0, 0, 1, 0];
+		
 	}
 	
-	
-	public function setPrev( x:Float, y:Float ) :Void {
+	public function setPrev(prevX:Float, prevY:Float) :Void {
 		if (_prev == null) {
-			_prev = new Vector2D(x, y);
-		} else {
-			_prev.x = x;
-			_prev.y = y;
+			_prev = new Vec2(prevX, prevY);
+		}
+		else {
+			_prev.x = prevX;
+			_prev.y = prevY;
 		}
 		_changed = true;
 	}
-	public function setPrevPoint( prev:Vector2D ) :Void {
+	public function setPrevPoint( prev:Vec2 ) :Void {
 		_prev = prev; 
 		_changed = true;
 	}
 	
-	public function setNext( x:Float, y:Float ) :Void {
+	public function setNext(nextX:Float, nextY:Float) :Void {
 		if (_next == null) {
-			_next = new Vector2D(x, y);
-		} else {
-			_next.x = x;
-			_next.y = y;
+			_next = new Vec2(nextX, nextY);
+		}
+		else {
+			_next.x = nextX;
+			_next.y = nextY;
 		}
 		_changed = true;
 	}
-	public function setNextPoint( next:Vector2D ) :Void {
+	public function setNextPoint( next:Vec2 ) :Void {
 		_next = next;
 		_changed = true;
 	}
@@ -89,19 +69,19 @@ class SplineSegment extends LineSegment
 			resetSpline(); 
 		}
 		
-		_verts.add(start);
+		_verts.add(a);
 		for (p in _pointsBetween)
 		{
 			_verts.add(p);
 		}
-		_verts.add(end);
+		_verts.add(b);
 		
 		return _verts;
 	}
 	
 	public override function draw( graphics:Graphics ) :Void {
 		
-		graphics.moveTo(start.x, start.y);
+		graphics.moveTo(ax, ay);
 		
 		// if we are using the points at all, we need to make sure they are correct
 		if (_changed)
@@ -111,20 +91,19 @@ class SplineSegment extends LineSegment
 			graphics.lineTo(p.x, p.y);
 		}
 		
-		graphics.lineTo(end.x, end.y);
+		graphics.lineTo(bx, by);
 	}
 	
 	private function resetSpline() {
 		
 		_pointsBetween.clear(); // TODO: will need to change when pooling Point objects is added...
 		
-		smoothSpline( start.x, start.y, end.x, end.y,
-			(_prev == null ? start.x : _prev.x), (_prev == null ? start.y : _prev.y),
-			(_next == null ? end.x   : _next.x), (_next == null ? end.y   : _next.y) );
+		smoothSpline( ax, ay, bx, by,
+			(_prev == null ? ax : _prev.x), (_prev == null ? ay : _prev.y),
+			(_next == null ? bx : _next.x), (_next == null ? by : _next.y) );
 			
 		_changed = false;
 	}
-	
 	
 	private function smoothSpline(_startX:Float, _startY:Float, _endX:Float, _endY:Float,
 							_prevX:Float, _prevY:Float, _nextX:Float, _nextY:Float ) :Void
@@ -151,11 +130,10 @@ class SplineSegment extends LineSegment
 		}
 	}
 	
-	
-	private function set_resolution( r:Int ) :Int	{ 
-		resolution = 1 / r;
+	private function setRes( res:Int ) :Int	{ 
+		_res = 1 / res;
 		_hermiteValues = [];
-		_t = resolution;
+		_t = _res;
 		while (_t <= 1) {
 			_h00 = (1 + 2 * _t) * (1 - _t) * (1 - _t);
 			_h10 = _t  * (1 - _t) * (1 - _t);
@@ -165,11 +143,31 @@ class SplineSegment extends LineSegment
 			_hermiteValues.push(_h10);
 			_hermiteValues.push(_h01);
 			_hermiteValues.push(_h11);
-			_t += resolution;
+			_t += _res;
 		}
 		_changed = true;
-		return r;
+		return res;
 	}
 	
+	private var _pointsBetween:List<Vec2>;
+	private var _verts:Vertices;
+	private var _changed:Bool;
+	
+	private var _prev:Vec2;
+	private var _next:Vec2;
+	
+	private var _m1: { x:Float, y:Float };
+	private var _m2: { x:Float, y:Float };
+	private var _px:Float;
+	private var _py:Float; 
+	private var _t:Float;
+	private var _i:Int;
+	private var _l:Int;
+	private var _hermiteValues:Array<Float>;
+	private var _h00:Float;
+	private var _h10:Float;
+	private var _h01:Float;
+	private var _h11:Float;
+	private var _res:Float;
 	
 }

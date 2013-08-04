@@ -1,26 +1,26 @@
 package sge.core;
 
+import nme.Assets;
+import nme.Lib;
+import nme.display.Graphics;
+import nme.display.Sprite;
+import nme.display.BitmapData;
+import nme.display.FPS;
+import nme.display.Stage;
+import nme.errors.Error;
+import nme.events.Event;
+import nme.events.KeyboardEvent;
 
-import flash.Lib;
-import flash.display.BitmapData;
-import flash.display.Graphics;
-import flash.display.MovieClip;
-import flash.display.Sprite;
-import flash.display.Stage;
-import flash.errors.Error;
-import flash.events.Event;
-import flash.events.KeyboardEvent;
-import openfl.Assets;
-import openfl.display.FPS;
+import haxe.FastList;
 import haxe.Timer;
-import haxe.ds.StringMap;
-import motion.Actuate;
+import com.eclecticdesignstudio.motion.Actuate;
 
 import sge.graphics.AssetManager;
 import sge.graphics.Draw;
 import sge.io.Input;
 import sge.lib.Properties;
-import sge.math.Random;
+import sge.random.Random;
+
 
 /**
  * @author fidgetwidget
@@ -38,54 +38,60 @@ class Engine
 	 */
 	public static var instance : Engine;
 	
+	public static var delta(get_delta, null) :Float;
+	public static var root(get_root, null) : Sprite;
+	public static var stage(get_stage, null) :Stage;
+	public static var graphics(get_graphics, null) :Graphics;
+	public static var properties(default, null) :Properties;
+	
 	/*
-	 * Instance Properties
+	 * Properties
 	 */
-	public static var delta			(get_delta, null) 		: Float;
-	public static var root			(get_root, null) 		: Sprite;
-	public static var stage			(get_stage, null) 		: Stage;
-	public static var graphics		(get_graphics, null) 	: Graphics;
-	public static var properties	(default, null) 		: Properties;
+	public var stageSprite : Sprite; // a temp solution to make the added to stage event trigger the init 
 	
 	/*
 	 * Members
 	 */	
 	private var _fps:FPS;	
-	private var _delta 		: Float;
-	private var _root 		: Sprite;
-	private var _stage 		: Stage;
-	private var _graphics 	: Graphics;
-	private var _scene		: Scene;
+	// Scene Manager	
+	private var topScene:String; // scene name for access via scenes
+	private var nextScene:String;
+	private var _s:Scene;
+	private var _delta : Float;
+	private var _root : Sprite;
+	private var _stage : Stage;
+	private var _graphics : Graphics;
 	
-	/// Timer
-	private var _start:Float;
-	private var _last:Float;
-	private var _current:Float;
-	
-	
-	public function new() {		
+	public function new(root) {
 		
-		_fps = new FPS(10, 10, 0xCC1243 );	
+		_root = root;
+		stageSprite = new Sprite(); // temp solution - used to init on "Added to Stage"		
+		
+		_fps = new FPS();
+		
+		// scene manager data
+		scenes = new Hash();
+		_sceneNames = new Array<String>();
+		_s = null;
+		topScene = "";
+		nextScene = "";
 		
 		properties = new Properties();
 	}
 	
-	public function init( root:MovieClip ) :Void
+	public function init() :Void
 	{	
 		_start = _current = Timer.stamp();
 		
-		_root = root;
 		_stage = root.stage;
-		_graphics = root.graphics;
-		
 		properties.add("_STAGE_WIDTH", _stage.stageWidth);
 		properties.add("_STAGE_HEIGHT", _stage.stageHeight);
 		
+		_graphics = root.graphics;
 		Input.init( _stage );
 		Draw.init( _graphics );
 		EntityFactory.init();
 		AssetManager.init();
-		SceneManager.init();
 		Random.init( Std.int(_start) );
 		Actuate.reset(); // not nessesary, but just here to remind that you have access to Actuate
 		
@@ -93,13 +99,12 @@ class Engine
 		_stage.addEventListener( Event.DEACTIVATE, function(_) _pause() );
 		
 		_stage.addChild( _fps );		
-		
 		_stage.addEventListener(Event.ENTER_FRAME, function(_) update());
 	}
 	
 	public function update() :Void { 	
 		
-		_updateDelta();
+		_updateDelta();		
 		
 		_preUpdate();
 		
@@ -129,9 +134,10 @@ class Engine
 	
 	// Update AFTER the Input Update
 	private function _update() :Void {
-		_scene = SceneManager.currentScene;
-		if (_scene != null)
-			_scene.update( delta );
+		_s = scenes.get(topScene);
+		if (_s != null) {
+			_s.update( _delta );
+		}
 	}
 	
 	private function _render() :Void {
@@ -139,10 +145,10 @@ class Engine
 		_graphics.clear();
 		
 		// Draw the active Scene
-		_scene = SceneManager.currentScene;
-		if (_scene != null)
-			_scene.render();
-		
+		_s = scenes.get(topScene);
+		if (_s != null) { 
+			_s.render();
+		}
 	}
 	
 	private function _postUpdate() :Void {
@@ -155,19 +161,66 @@ class Engine
 	
 	private function _resume() :Void {
 		Actuate.resumeAll();
-	}	
+	}
+	
+	// Timer variables
+	private var _start:Float;
+	private var _last:Float;
+	private var _current:Float;
+	
 
 	/// -------------------------------------------------------------------
 	///  Scene Manager
 	/// -------------------------------------------------------------------
-	
+	// TODO: create the SceneManager class and put this code in there
 	public function addScene( scene:Scene, readyNow:Bool = false ) :Void {
-		SceneManager.addScene( scene, readyNow );
+		// TODO: do some error handling here
+		scenes.set(scene.id, scene);
+		_sceneNames.push(scene.id);
+		
+		if (readyNow) {
+			readyScene(scene.id);
+		}
 	}
 	
-	public function readyScene( sceneId:String ) :Void {
-		SceneManager.readyScene( sceneId );
-	}	
+	/**
+	 * Readies the scene 
+	 * @param	sceneId
+	 */
+	public function readyScene( sceneId:String ) :Void {		
+		
+		if (!scenes.exists(sceneId)) { return; } // TODO: throw an error?
+		
+		nextScene = sceneId;
+		_s = scenes.get(topScene);
+		if (_s != null) { 
+			_s.on_Exit = _exitScene;
+			_s.exit(); 
+		} else {
+			_s = scenes.get(nextScene);
+			topScene = nextScene;
+			nextScene = "";
+			_s.ready();
+		}
+	}
+	
+	private function _exitScene( s:Scene ) :Void {
+		_s = scenes.get(topScene);
+		if (s != _s) { return; }
+		_s.on_Exit = null;
+		
+		_s = scenes.get(nextScene);
+		topScene = nextScene;
+		nextScene = "";
+		if (_s == null) { return; }
+		_s.ready();
+	}
+
+	
+	// Scene Manager hash table
+	private var scenes:Hash<Scene>;
+	private var _sceneNames:Array<String>;
+	
 	
 	/// -------------------------------------------------------------------
 	///  Asset Manager

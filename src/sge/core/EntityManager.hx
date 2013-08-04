@@ -1,9 +1,7 @@
 package sge.core;
 
-import haxe.ds.IntMap;
-
-import sge.lib.IHasBounds;
-import sge.collision.AABB;
+import sge.interfaces.IHasBounds;
+import sge.physics.AABB;
 
 /**
  * Basic Type of Entity Manager
@@ -24,7 +22,7 @@ class EntityManager implements IHasBounds
 	/*
 	 * Members
 	 */
-	private var _idSortedEntities:IntMap<Entity>;
+	private var _idSortedEntities:IntHash<Entity>;
 	private var _bounds:AABB;
 	
 	/**
@@ -32,7 +30,7 @@ class EntityManager implements IHasBounds
 	 */
 	public function new() 
 	{ 
-		_idSortedEntities = new IntMap<Entity>();
+		_idSortedEntities = new IntHash<Entity>();
 	}
 	
 	/**
@@ -100,7 +98,7 @@ class EntityManager implements IHasBounds
 	}
 	
 	/// IHasBounds
-	public function get_bounds() :AABB 
+	public function getBounds() :AABB 
 	{
 		return _bounds;
 	}

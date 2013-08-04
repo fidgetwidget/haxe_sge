@@ -62,6 +62,9 @@ class TileCollider extends BoxCollider
 		_results = CollisionMath.boxPointCollision( getBounds(), x, y, cdata );
 		if (cdata != null) {
 			_correctData( cdata );
+			if (cdata.px == 0 && cdata.py == 0) {
+				_results = false;
+			}
 		} 
 		return _results;
 	}
@@ -73,6 +76,9 @@ class TileCollider extends BoxCollider
 		_results = CollisionMath.boxLineCollision( getBounds(), x1, y1, x2, y2, cdata );
 		if (cdata != null) {
 			_correctData( cdata );
+			if (cdata.px == 0 && cdata.py == 0) {
+				_results = false;
+			}
 		} 
 		return _results;
 	}
@@ -84,6 +90,9 @@ class TileCollider extends BoxCollider
 		_results = CollisionMath.boxBoxCollision( getBounds(), target, cdata );
 		if (_results && cdata != null) {
 			_correctData( cdata );
+			if (cdata.px == 0 && cdata.py == 0) {
+				_results = false;
+			}
 		} 
 		return _results;
 	}
@@ -95,6 +104,9 @@ class TileCollider extends BoxCollider
 		_results = CollisionMath.boxBoxCollision( getBounds(), b.getBounds(), cdata );
 		if (_results && cdata != null) {
 			_correctData( cdata );
+			if (cdata.px == 0 && cdata.py == 0) {
+				_results = false;
+			}
 		} 
 		return _results;
 	}
@@ -106,6 +118,9 @@ class TileCollider extends BoxCollider
 		_results = CollisionMath.boxCircleCollision( getBounds(), c, cdata );
 		if (_results && cdata != null) {
 			_correctData( cdata );
+			if (cdata.px == 0 && cdata.py == 0) {
+				_results = false;
+			}
 		} 
 		return _results;
 	}

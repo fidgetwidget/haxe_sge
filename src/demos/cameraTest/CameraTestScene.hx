@@ -25,10 +25,6 @@ import sge.physics.Motion;
 import sge.physics.CollisionMath;
 import sge.random.Random;
 
-#if (!js)
-import sge.core.Debug;
-#end
-
 /**
  * ...
  * @author fidgetwidget
@@ -137,19 +133,6 @@ class CameraTestScene extends Scene
 			add( block );
 			mg.addChild(block.mc);
 		}
-		
-#if (!js)
-		Debug.registerVariable(camera.bounds, "left", "cam_left", true);
-		Debug.registerVariable(camera.bounds, "right", "cam_right", true);
-		Debug.registerVariable(camera.bounds, "top", "cam_top", true);
-		Debug.registerVariable(camera.bounds, "bottom", "cam_bottom", true);
-		
-		Debug.registerVariable(camera.sceneBounds, "left", "scene_left", true);
-		Debug.registerVariable(camera.sceneBounds, "right", "scene_right", true);
-		Debug.registerVariable(camera.sceneBounds, "top", "scene_top", true);
-		Debug.registerVariable(camera.sceneBounds, "bottom", "scene_bottom", true);
-#end
-
 	}
 		
 	override private function _handleInput(delta:Float):Void 
@@ -157,50 +140,43 @@ class CameraTestScene extends Scene
 		localX = Input.mouseX + camera.x;
 		localY = Input.mouseY + camera.y;
 		
-#if (!js)
-		if ( !Debug.on ) {
-#end
+		if ( Input.isKeyPressed( Keyboard.SPACE ) ) {
+			camera.moveTo(GRID_WIDTH * 0.5, GRID_HEIGHT * 0.5, 0.3);
+			followPlayer = false;
+			camera.followTarget(null);
+			moveCamera = false;
+		}
 		
-			if ( Input.isKeyPressed( Keyboard.SPACE ) ) {
-				camera.moveTo(GRID_WIDTH * 0.5, GRID_HEIGHT * 0.5, 0.3);
-				followPlayer = false;
+		if ( Input.isKeyPressed( Keyboard.F ) ) {
+			followPlayer = !followPlayer;				
+			if (followPlayer) {
+				camera.followTarget( player.transform.position, targetType );
+			} 
+			else {
 				camera.followTarget(null);
-				moveCamera = false;
-			}
-			
-			if ( Input.isKeyPressed( Keyboard.F ) ) {
-				followPlayer = !followPlayer;				
-				if (followPlayer) {
-					camera.followTarget( player.transform.position, targetType );
-				} 
-				else {
-					camera.followTarget(null);
-				}				
-				moveCamera = false;
-			}
+			}				
+			moveCamera = false;
+		}
 			
 #if (!js)
-			if ( Input.isKeyPressed( Keyboard.NUMBER_1 ) ) {			
-				targetType = Camera.TARGET_FIXED;
-				if (followPlayer) {
-					camera.followTarget( player.transform.position, targetType );
-				}
+		
+		if ( Input.isKeyPressed( Keyboard.NUMBER_1 ) ) {			
+			targetType = Camera.TARGET_FIXED;
+			if (followPlayer) {
+				camera.followTarget( player.transform.position, targetType );
 			}
-			if ( Input.isKeyPressed( Keyboard.NUMBER_2 ) ) {		
-				targetType = Camera.TARGET_CLOSE;
-				if (followPlayer) {
-					camera.followTarget( player.transform.position, targetType );
-				}
+		}
+		if ( Input.isKeyPressed( Keyboard.NUMBER_2 ) ) {		
+			targetType = Camera.TARGET_CLOSE;
+			if (followPlayer) {
+				camera.followTarget( player.transform.position, targetType );
 			}
-			if ( Input.isKeyPressed( Keyboard.NUMBER_3 ) ) {
-				targetType = Camera.TARGET_LOOSE;
-				if (followPlayer) {
-					camera.followTarget( player.transform.position, targetType );
-				}
+		}
+		if ( Input.isKeyPressed( Keyboard.NUMBER_3 ) ) {
+			targetType = Camera.TARGET_LOOSE;
+			if (followPlayer) {
+				camera.followTarget( player.transform.position, targetType );
 			}
-#end
-			
-#if (!js)	
 		}
 #end
 		

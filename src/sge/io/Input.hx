@@ -1,14 +1,15 @@
 package sge.io;
 
-import flash.display.Stage;
-import flash.events.KeyboardEvent;
-import flash.events.MouseEvent;
-import flash.geom.Point;
-import flash.ui.Keyboard;
-import flash.ui.Mouse;
-
-import openfl.events.JoystickEvent;
-import openfl.display.Tilesheet;
+import nme.display.Stage;
+import nme.display.Tilesheet;
+import nme.events.KeyboardEvent;
+import nme.events.MouseEvent;
+import nme.geom.Point;
+import nme.ui.Keyboard;
+import nme.ui.Mouse;
+#if (cpp || neko || display)
+import nme.events.JoystickEvent;
+#end
 
 /**
  * Concept Taken from Flixel
@@ -189,118 +190,118 @@ class Input
 	// Add all of the nme.ui.Keyboard values to the map
 	private static function initKeys() :Void {
 		
-		addKey(Keyboard.A); // 65
-		addKey(Keyboard.B); // 66
-		addKey(Keyboard.C); // 67
-		addKey(Keyboard.D); // 68
-		addKey(Keyboard.E); // 69
-		addKey(Keyboard.F); // 70
-		addKey(Keyboard.G); // 71
-		addKey(Keyboard.H); // 72
-		addKey(Keyboard.I); // 73
-		addKey(Keyboard.J); // 74
-		addKey(Keyboard.K); // 75
-		addKey(Keyboard.L); // 76
-		addKey(Keyboard.M); // 77
-		addKey(Keyboard.N); // 78
-		addKey(Keyboard.O); // 79
-		addKey(Keyboard.P); // 80
-		addKey(Keyboard.Q); // 81
-		addKey(Keyboard.R); // 82
-		addKey(Keyboard.S); // 83
-		addKey(Keyboard.T); // 84
-		addKey(Keyboard.U); // 85
-		addKey(Keyboard.V); // 86
-		addKey(Keyboard.W); // 87
-		addKey(Keyboard.X); // 88
-		addKey(Keyboard.Y); // 89
-		addKey(Keyboard.Z); // 90
-		addKey(Keyboard.BACKSPACE); // 8
-		addKey(Keyboard.CAPS_LOCK); // 20		
-		addKey(Keyboard.CONTROL); // 17
-		addKey(Keyboard.DELETE); // 46
-		addKey(Keyboard.DOWN); // 40
-		addKey(Keyboard.END); // 35
-		addKey(Keyboard.ENTER); // 13		
-		addKey(Keyboard.ESCAPE); // 27
-		addKey(Keyboard.F1); // 112
-		addKey(Keyboard.F2); // 113
-		addKey(Keyboard.F3); // 114
-		addKey(Keyboard.F4); // 115
-		addKey(Keyboard.F5); // 116
-		addKey(Keyboard.F6); // 117
-		addKey(Keyboard.F7); // 118
-		addKey(Keyboard.F8); // 119
-		addKey(Keyboard.F9); // 120
-		addKey(Keyboard.F10); // 121
-		addKey(Keyboard.F11); // 122
-		addKey(Keyboard.F12); // 123
-		addKey(Keyboard.F13); // 124
-		addKey(Keyboard.F14); // 125
-		addKey(Keyboard.F15); // 126
-		addKey(Keyboard.HOME); // 36
-		addKey(Keyboard.INSERT); // 45
-		addKey(Keyboard.LEFT); // 37		
-		addKey(Keyboard.NUMPAD_0); // 96
-		addKey(Keyboard.NUMPAD_1); // 97
-		addKey(Keyboard.NUMPAD_2); // 98
-		addKey(Keyboard.NUMPAD_3); // 99
-		addKey(Keyboard.NUMPAD_4); // 100
-		addKey(Keyboard.NUMPAD_5); // 101
-		addKey(Keyboard.NUMPAD_6); // 102
-		addKey(Keyboard.NUMPAD_7); // 103
-		addKey(Keyboard.NUMPAD_8); // 104
-		addKey(Keyboard.NUMPAD_9); // 105
-		addKey(Keyboard.NUMPAD_ADD); // 107
-		addKey(Keyboard.NUMPAD_DECIMAL); // 110
-		addKey(Keyboard.NUMPAD_DIVIDE); // 111
-		addKey(Keyboard.NUMPAD_ENTER); // 108
-		addKey(Keyboard.NUMPAD_MULTIPLY); // 106
-		addKey(Keyboard.NUMPAD_SUBTRACT); // 109
-		addKey(Keyboard.PAGE_DOWN); // 34
-		addKey(Keyboard.PAGE_UP); // 33		
-		addKey(Keyboard.RIGHT); // 39		
-		addKey(Keyboard.SHIFT); // 16		
-		addKey(Keyboard.SPACE); // 32
-		addKey(Keyboard.TAB); // 9
-		addKey(Keyboard.UP); // 38
+		addKey(nme.ui.Keyboard.A); // 65
+		addKey(nme.ui.Keyboard.B); // 66
+		addKey(nme.ui.Keyboard.C); // 67
+		addKey(nme.ui.Keyboard.D); // 68
+		addKey(nme.ui.Keyboard.E); // 69
+		addKey(nme.ui.Keyboard.F); // 70
+		addKey(nme.ui.Keyboard.G); // 71
+		addKey(nme.ui.Keyboard.H); // 72
+		addKey(nme.ui.Keyboard.I); // 73
+		addKey(nme.ui.Keyboard.J); // 74
+		addKey(nme.ui.Keyboard.K); // 75
+		addKey(nme.ui.Keyboard.L); // 76
+		addKey(nme.ui.Keyboard.M); // 77
+		addKey(nme.ui.Keyboard.N); // 78
+		addKey(nme.ui.Keyboard.O); // 79
+		addKey(nme.ui.Keyboard.P); // 80
+		addKey(nme.ui.Keyboard.Q); // 81
+		addKey(nme.ui.Keyboard.R); // 82
+		addKey(nme.ui.Keyboard.S); // 83
+		addKey(nme.ui.Keyboard.T); // 84
+		addKey(nme.ui.Keyboard.U); // 85
+		addKey(nme.ui.Keyboard.V); // 86
+		addKey(nme.ui.Keyboard.W); // 87
+		addKey(nme.ui.Keyboard.X); // 88
+		addKey(nme.ui.Keyboard.Y); // 89
+		addKey(nme.ui.Keyboard.Z); // 90
+		addKey(nme.ui.Keyboard.BACKSPACE); // 8
+		addKey(nme.ui.Keyboard.CAPS_LOCK); // 20		
+		addKey(nme.ui.Keyboard.CONTROL); // 17
+		addKey(nme.ui.Keyboard.DELETE); // 46
+		addKey(nme.ui.Keyboard.DOWN); // 40
+		addKey(nme.ui.Keyboard.END); // 35
+		addKey(nme.ui.Keyboard.ENTER); // 13		
+		addKey(nme.ui.Keyboard.ESCAPE); // 27
+		addKey(nme.ui.Keyboard.F1); // 112
+		addKey(nme.ui.Keyboard.F2); // 113
+		addKey(nme.ui.Keyboard.F3); // 114
+		addKey(nme.ui.Keyboard.F4); // 115
+		addKey(nme.ui.Keyboard.F5); // 116
+		addKey(nme.ui.Keyboard.F6); // 117
+		addKey(nme.ui.Keyboard.F7); // 118
+		addKey(nme.ui.Keyboard.F8); // 119
+		addKey(nme.ui.Keyboard.F9); // 120
+		addKey(nme.ui.Keyboard.F10); // 121
+		addKey(nme.ui.Keyboard.F11); // 122
+		addKey(nme.ui.Keyboard.F12); // 123
+		addKey(nme.ui.Keyboard.F13); // 124
+		addKey(nme.ui.Keyboard.F14); // 125
+		addKey(nme.ui.Keyboard.F15); // 126
+		addKey(nme.ui.Keyboard.HOME); // 36
+		addKey(nme.ui.Keyboard.INSERT); // 45
+		addKey(nme.ui.Keyboard.LEFT); // 37		
+		addKey(nme.ui.Keyboard.NUMPAD_0); // 96
+		addKey(nme.ui.Keyboard.NUMPAD_1); // 97
+		addKey(nme.ui.Keyboard.NUMPAD_2); // 98
+		addKey(nme.ui.Keyboard.NUMPAD_3); // 99
+		addKey(nme.ui.Keyboard.NUMPAD_4); // 100
+		addKey(nme.ui.Keyboard.NUMPAD_5); // 101
+		addKey(nme.ui.Keyboard.NUMPAD_6); // 102
+		addKey(nme.ui.Keyboard.NUMPAD_7); // 103
+		addKey(nme.ui.Keyboard.NUMPAD_8); // 104
+		addKey(nme.ui.Keyboard.NUMPAD_9); // 105
+		addKey(nme.ui.Keyboard.NUMPAD_ADD); // 107
+		addKey(nme.ui.Keyboard.NUMPAD_DECIMAL); // 110
+		addKey(nme.ui.Keyboard.NUMPAD_DIVIDE); // 111
+		addKey(nme.ui.Keyboard.NUMPAD_ENTER); // 108
+		addKey(nme.ui.Keyboard.NUMPAD_MULTIPLY); // 106
+		addKey(nme.ui.Keyboard.NUMPAD_SUBTRACT); // 109
+		addKey(nme.ui.Keyboard.PAGE_DOWN); // 34
+		addKey(nme.ui.Keyboard.PAGE_UP); // 33		
+		addKey(nme.ui.Keyboard.RIGHT); // 39		
+		addKey(nme.ui.Keyboard.SHIFT); // 16		
+		addKey(nme.ui.Keyboard.SPACE); // 32
+		addKey(nme.ui.Keyboard.TAB); // 9
+		addKey(nme.ui.Keyboard.UP); // 38
 		
-		// not supported in html5 build (old nme rule... might not be true anymore)
+		// not supported in html5 build
 #if !js
-		addKey(Keyboard.ALTERNATE); // 18
-		addKey(Keyboard.BACKQUOTE); // 192
-		addKey(Keyboard.BACKSLASH); // 220
-		addKey(Keyboard.COMMA); // 188
-		addKey(Keyboard.COMMAND); // 15
-		addKey(Keyboard.EQUAL); // 187
-		addKey(Keyboard.LEFTBRACKET); // 219
-		addKey(Keyboard.MINUS); // 189
-		addKey(Keyboard.NUMBER_0); // 48
-		addKey(Keyboard.NUMBER_1); // 49
-		addKey(Keyboard.NUMBER_2); // 50
-		addKey(Keyboard.NUMBER_3); // 51
-		addKey(Keyboard.NUMBER_4); // 52
-		addKey(Keyboard.NUMBER_5); // 53
-		addKey(Keyboard.NUMBER_6); // 54
-		addKey(Keyboard.NUMBER_7); // 55
-		addKey(Keyboard.NUMBER_8); // 56
-		addKey(Keyboard.NUMBER_9); // 57
-		addKey(Keyboard.NUMPAD); // 21
-		addKey(Keyboard.RIGHTBRACKET); // 221
-		addKey(Keyboard.SEMICOLON); // 186
-		addKey(Keyboard.PERIOD); // 190
-		addKey(Keyboard.QUOTE); // 222
-		addKey(Keyboard.SLASH); // 191	
+		addKey(nme.ui.Keyboard.ALTERNATE); // 18
+		addKey(nme.ui.Keyboard.BACKQUOTE); // 192
+		addKey(nme.ui.Keyboard.BACKSLASH); // 220
+		addKey(nme.ui.Keyboard.COMMA); // 188
+		addKey(nme.ui.Keyboard.COMMAND); // 15
+		addKey(nme.ui.Keyboard.EQUAL); // 187
+		addKey(nme.ui.Keyboard.LEFTBRACKET); // 219
+		addKey(nme.ui.Keyboard.MINUS); // 189
+		addKey(nme.ui.Keyboard.NUMBER_0); // 48
+		addKey(nme.ui.Keyboard.NUMBER_1); // 49
+		addKey(nme.ui.Keyboard.NUMBER_2); // 50
+		addKey(nme.ui.Keyboard.NUMBER_3); // 51
+		addKey(nme.ui.Keyboard.NUMBER_4); // 52
+		addKey(nme.ui.Keyboard.NUMBER_5); // 53
+		addKey(nme.ui.Keyboard.NUMBER_6); // 54
+		addKey(nme.ui.Keyboard.NUMBER_7); // 55
+		addKey(nme.ui.Keyboard.NUMBER_8); // 56
+		addKey(nme.ui.Keyboard.NUMBER_9); // 57
+		addKey(nme.ui.Keyboard.NUMPAD); // 21
+		addKey(nme.ui.Keyboard.RIGHTBRACKET); // 221
+		addKey(nme.ui.Keyboard.SEMICOLON); // 186
+		addKey(nme.ui.Keyboard.PERIOD); // 190
+		addKey(nme.ui.Keyboard.QUOTE); // 222
+		addKey(nme.ui.Keyboard.SLASH); // 191	
 #end
 	}
 	
 	/* --- Mouse --- */
 	
-	public static var mouseX(get_mouseX, never):Float;
-	public static var mouseY(get_mouseY, never):Float;
+	public static var mouseX(getMouseX, never):Float;
+	public static var mouseY(getMouseY, never):Float;
 	
-	public static function get_mouseX() :Float { return _mouseCursor.x; }
-	public static function get_mouseY() :Float { return _mouseCursor.y; }
+	public static function getMouseX() :Float { return _mouseCursor.x; }
+	public static function getMouseY() :Float { return _mouseCursor.y; }
 	
 	public static function getMousePoint() :Point { return _mouseCursor; }
 	

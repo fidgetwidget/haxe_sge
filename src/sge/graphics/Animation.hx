@@ -2,34 +2,30 @@ package sge.graphics;
 
 /**
  * ...
- * @author ...
+ * @author fidgetwidget
  */
-class Animation
-{
 
+class Animation 
+{
+	
 	/*
 	 * Properties
 	 */
-	public var name				: String;
-	public var frames			: Array<Int>;
-	public var framerate		: Int;
-	public var loop				: Bool;
-	public var currentFrame		(get, never) : Int;
+	public var name:String;
+	public var frames:Array<Int>;
+	public var framerate:Int;
+	public var loop:Bool;
+	public var currentFrame(get_currentFrame, never):Int;
 	
-	public var onComplete		: Dynamic;	// on complete callback
-	public var onLoop			: Dynamic;		// on loop callback
+	public var onComplete:Dynamic;	// on complete callback
+	public var onLoop:Dynamic;		// on loop callback
 	
+	private var _paused:Bool = true;
+	private var _complete:Bool = false;
+	private var _delta:Float = 0;
+	private var _currentIndex:Int;
 	
-	/*
-	 * Members
-	 */
-	private var _paused			: Bool = true;
-	private var _complete		: Bool = false;
-	private var _delta			: Float = 0;
-	private var _currentIndex	: Int;
-	
-	/// Static Id for use in constructor
-	private static var uniqueId	: Int = 0;
+	private static var uniqueId:Int = 0;
 
 	public function new( name:String = "", frames:Array<Int> = null, framerate:Int = 30, loop:Bool = false, onComplete:Dynamic = null ) 
 	{
@@ -91,9 +87,6 @@ class Animation
 		
 	}
 	
-	/*
-	 * Getters & Setters
-	 */
 	private function get_currentFrame() :Void { return frames[_currentIndex]; }
 	
 }

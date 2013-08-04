@@ -1,20 +1,23 @@
 package sge.graphics;
 
-import flash.display.Bitmap;
-import flash.display.BitmapData;
-import flash.display.Graphics;
-import flash.display.GraphicsPathCommand;
-import flash.display.IBitmapDrawable;
-import flash.display.IGraphicsData;
-import flash.display.Stage;
-import sge.math.Motion;
-
+import nme.display.Bitmap;
+import nme.display.GraphicsPathCommand;
+import nme.Vector;
+import sge.core.Camera;
 import sge.core.Engine;
-import sge.collision.AABB;
+import sge.physics.AABB;
 
+import nme.display.Stage;
+import nme.display.Graphics;
+import nme.display.BitmapData;
+import nme.display.IBitmapDrawable;
+import nme.display.IGraphicsData;
+import nme.Vector;
 
 /**
  * A Drawing Helper
+ * Allows for batching of graphic and bitmap drawing
+ * TODO: test this and make sure it all works
  * 
  * @author fidgetwidget
  */
@@ -65,20 +68,6 @@ class Draw
 		 
 		Draw.graphics.drawRect(_x, _y, _width, _height);
 	}
-	
-	public static function debug_drawVelocity( x:Float, y:Float, motion:Motion, scale:Float = 0.25, camera:Camera = null ) {
-		
-		if (camera == null) {
-			Draw.graphics.moveTo( x, y );
-			Draw.graphics.lineTo( x + (motion.vx * scale), y + (motion.vy * scale) );
-		} else {
-			Draw.graphics.moveTo( x - camera.ix, y - camera.iy );
-			Draw.graphics.lineTo( x - camera.ix + (motion.vx * scale), y - camera.iy + (motion.vy * scale) );
-		}
-		
-	}
-	
-	/// Memory Saving Variables
 	private static var _x:Float;
 	private static var _y:Float;
 	private static var _width:Float;
