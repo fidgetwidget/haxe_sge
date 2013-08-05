@@ -1,32 +1,49 @@
 package sge.geom;
 
-import nme.display.Graphics;
-import nme.geom.Point;
-
-import sge.core.Camera;
-import sge.graphics.Draw;
-import sge.geom.Vertices;
-import sge.physics.Vec2;
+import flash.display.Graphics;
+import flash.geom.Point;
+import sge.graphics.Camera;
+import sge.math.Vector2D;
 
 /**
  * ...
  * @author fidgetwidget
  */
-
 class Path extends Vertices
 {
 
-	public var currentPosition( get_currentPosition, never ):Vec2;
-	public var on_pathComplete:Dynamic;
+	/*
+	 * Properties
+	 */	
+	public var currentPosition	( get, never ) : Vector2D;
+	public var on_pathComplete	: Dynamic;
+	
+	/*
+	 * Members
+	 */
+	private var _passedTarget	: Bool = false;
+	private var _current		: Vector2D;	
+	private var _target			: Vector2D;
+	
+	/// Memory Savers
+	private var _point			: Vector2D;
+	private var _ev				: Vector2D;
+	private var _dx				: Float;
+	private var _dy				: Float;
+	private var _xx				: Float;
+	private var _yy				: Float;
+	private var _m				: Float;
+	
+	
 	
 	public function new( points:Array<Point> = null ) 
 	{
 		super(points);
-		_ev = new Vec2();
+		_ev = new Vector2D();
 		_current = null;
 	}
 	
-	public function move( delta:Float, speed:Float ) :Vec2 {
+	public function move( delta:Float, speed:Float ) :Vector2D {
 		
 		if (_current == null) {
 			if (_verts.length == 0) 
@@ -112,7 +129,7 @@ class Path extends Vertices
 	}
 	
 	
-	public function render( camera:Camera, graphics:Graphics ) :Void
+	public function draw( graphics:Graphics, camera:Camera = null ) :Void
 	{
 		_point = _current;
 		if (_current == null) { return; }
@@ -155,7 +172,7 @@ class Path extends Vertices
 	}
 	
 	
-	private function get_currentPosition() :Vec2 {
+	private function get_currentPosition() :Vector2D {
 		
 		if (_current == null) {
 			if (_verts.length == 0) 
@@ -167,18 +184,5 @@ class Path extends Vertices
 		
 		return _current; 
 	}
-	
-	private var _current:Vec2;
-	
-	private var _target:Vec2;
-	private var _ev:Vec2;
-	private var _dx:Float;
-	private var _dy:Float;
-	private var _xx:Float;
-	private var _yy:Float;
-	private var _m:Float;
-	private var _passedTarget:Bool = false;
-	
-	private var _point:Vec2;
 	
 }

@@ -1,53 +1,68 @@
 package sge.core;
 
-import com.eclecticdesignstudio.motion.Actuate;
-import nme.display.DisplayObject;
-import sge.interfaces.IRecyclable;
-import sge.physics.CollisionData;
-import sge.physics.CollisionResolver;
+import flash.display.DisplayObject;
+import motion.Actuate;
 
-import sge.physics.Transform;
-import sge.physics.Motion;
-import sge.physics.AABB;
-import sge.physics.Collider;
-import sge.interfaces.IHasBounds;
-import sge.interfaces.IHasId;
+import sge.collision.AABB;
+import sge.collision.CollisionData;
+import sge.collision.CollisionResolver;
+import sge.collision.Collider;
+import sge.lib.IRecyclable;
+import sge.lib.IHasBounds;
+import sge.lib.IHasId;
+import sge.math.Transform;
+import sge.math.Motion;
+import sge.math.Vector2D;
+
 
 /**
  * The basic type of object in a game
  * @author fidgetwidget
  */
 
-class Entity implements IHasBounds, implements IHasId, implements IRecyclable
+class Entity implements IHasBounds //, implements IHasId, implements IRecyclable <-- flashdevelop is throwing an error for some reason????
 {
 
-	public static inline var DYNAMIC	:Int = 1;
-	public static inline var STATIC		:Int = 2;
-	public static inline var FIXED		:Int = 4;	
+	public static inline var DYNAMIC	: Int = 1;
+	public static inline var STATIC		: Int = 2;
+	public static inline var FIXED		: Int = 4;
 	
 	/*
 	 * Properties
 	 */
-	public var id:Int;
-	public var parent:Entity;
-	public var className:String;
-		
-	public var x(get_x, set_x):Float;
-	public var y(get_y, set_y):Float;
-	public var ix(get_ix, set_ix):Int;
-	public var iy(get_iy, set_iy):Int;
-	public var rotation(get_r, set_r):Float;
-	public var scaleX(get_sx, set_sx):Float;
-	public var scaleY(get_sy, set_sy):Float;
-	public var transform(get_t, set_t):Transform;
-	public var motion(get_m, set_m):Motion;
+	public var id			: Int;
+	public var parent		: Entity;
+	public var className	: String;
 	
-	public var visible(get_visible, set_visible):Bool;
-	public var active(get_active, set_active):Bool;
+	// transformation access
+	public var x			(get, set)	: Float;
+	public var y			(get, set)	: Float;
+	public var ix			(get, set)	: Int;
+	public var iy			(get, set)	: Int;
+	public var z			(get, set)	: Float;
+	public var rotation		(get, set)	: Float;
+	public var scaleX		(get, set)	: Float;
+	public var scaleY		(get, set)	: Float;
+	public var transform	(get, set)	: Transform;
 	
-	public var mc:DisplayObject;
-	public var collider:Collider;
-	public var state:Int = STATIC; // should it be default Dynamic, or Static?
+	// motion access
+	public var vx			(get, set)	: Float;
+	public var vy			(get, set)	: Float;
+	public var ax			(get, set)	: Float;
+	public var ay			(get, set)	: Float;
+	public var fx			(get, set)	: Float;
+	public var fy			(get, set)	: Float;	
+	public var av			(get, set)	: Float;
+	public var aa			(get, set)	: Float;
+	public var af			(get, set)	: Float;	
+	public var motion		(get, set)	: Motion;
+	
+	public var visible		(get, set)	: Bool;
+	public var active		(get, set)	: Bool;
+	
+	public var mc			: DisplayObject;
+	public var collider		: Collider;
+	public var state		: Int = STATIC; // should it be default Dynamic, or Static?
 	
 	/*
 	 * Members
@@ -64,14 +79,14 @@ class Entity implements IHasBounds, implements IHasId, implements IRecyclable
 	{
 		id = EntityFactory.getNextEntityId();
 		_t = new Transform();
-		className = Type.getClassName(Entity);
+		className = Type.getClassName( Entity );
 	}
 	
 	/*
 	 * Update & Render
 	 */
 		
-	public function update( delta:Float ) :Void 
+	public function update( delta : Float ) :Void 
 	{
 		if (!active) { return; }
 		
@@ -81,15 +96,15 @@ class Entity implements IHasBounds, implements IHasId, implements IRecyclable
 	}
 	
 	// If there is user input that affects the entity, put that code here
-	private function _input( delta:Float ) :Void {}
+	private function _input( delta : Float ) : Void {}
 	
 	// Any non user input based updates go here
-	private function _update( delta:Float ) :Void  {}
+	private function _update( delta : Float ) : Void  {}
 	
 	// Lastly we udpate the transform based on the now updated motion
-	private function _updateTransform( delta:Float ) :Void 
+	private function _updateTransform( delta : Float ) : Void 
 	{
-		if (motion == null || !motion.inMotion) { return; }
+		if ( motion == null || !motion.inMotion ) { return; }
 		motion.apply( _t, delta ); // non collision transform update
 	}
 	
@@ -97,32 +112,32 @@ class Entity implements IHasBounds, implements IHasId, implements IRecyclable
 	/*
 	 * Render the entity
 	 */
-	public function render( camera ) :Void
+	public function render( camera ) : Void
 	{
-		if (!visible || mc == null) { return; }
+		if ( !visible || mc == null ) { return; }
 		_render( camera );
 	}
 	
-	private function _render( camera ) :Void {
+	private function _render( camera ) : Void {
 		
 	}
 	
 	/*
 	 * Collision Functions
 	 */
-	public function collisionTest( collider:Collider, cdata:CollisionData = null ) :Bool {
-		if (this.collider == null) { return false; }
+	public function collisionTest( collider : Collider, cdata : CollisionData = null ) : Bool {
+		if ( this.collider == null ) { return false; }
 		
-		return this.collider.collide(collider, cdata);
+		return this.collider.collide( collider, cdata );
 	}
 	
-	public function collisionAABBTest( aabb:AABB, cdata:CollisionData = null ) :Bool {
-		if (this.collider == null) { return false; }
+	public function collisionAABBTest( aabb : AABB, cdata : CollisionData = null ) : Bool {
+		if ( this.collider == null ) { return false; }
 		
-		return this.collider.collideAABB(aabb, cdata);
+		return this.collider.collideAABB( aabb, cdata );
 	}
 	
-	public function collideAndResolve( collider:Collider, resolver:CollisionResolver = null ) :Void {
+	public function collideAndResolve( collider : Collider, resolver : CollisionResolver = null ) : Void {
 		
 		// TODO: add in collision resolution types
 		// Default: minumum adjustment + zero the relevant velocity
@@ -135,66 +150,88 @@ class Entity implements IHasBounds, implements IHasId, implements IRecyclable
 	 */
 	/// Default duration is 0.33 (or 1/3rd of a second)
 	 
-	public function moveBy( x:Float, y:Float, time:Float = 0.33 ) :Void {
-		moveTo(this.x + x, this.y + y, time);
+	public function moveBy( x:Float, y:Float, time:Float = 0.33 ) : Void {
+		moveTo( this.x + x, this.y + y, time );
 	}	
-	public function moveTo( x:Float, y:Float, time:Float = 0.33 ) :Void {
-		Actuate.tween(this, time, { x:x, y:y } );
+	public function moveTo( x:Float, y:Float, time:Float = 0.33 ) : Void {
+		Actuate.tween( this, time, { x:x, y:y } );
 	}
 	
-	public function rotateBy( r:Float = 0, time:Float = 0.33 ) :Void {
+	public function rotateBy( r:Float = 0, time:Float = 0.33 ) : Void {
 		rotateTo( rotation + r, time );
 	}
-	public function rotateTo( r:Float, time:Float = 0.33 ) :Void {
+	public function rotateTo( r:Float, time:Float = 0.33 ) : Void {
 		Actuate.tween(this, time, { rotation:r } ).smartRotation();
 	}
 	
 	/*
 	 * Getters & Setters
 	 */
-	private function get_x() :Float 			{ return (parent == null) ? _t.x : _t.x + parent.x; }
-	private function get_y() :Float 			{ return (parent == null) ? _t.y : _t.y + parent.y; }
-	private function get_ix() :Int				{ return (parent == null) ? _t.ix : _t.ix + parent.ix; }
-	private function get_iy() :Int				{ return (parent == null) ? _t.iy : _t.iy + parent.iy; }
-	private function get_r() :Float 			{ return (parent == null) ? _t.rotation : _t.rotation + parent.rotation; }
-	private function get_sx() :Float 			{ return (parent == null) ? _t.scaleX : _t.scaleX + parent.scaleX; }
-	private function get_sy() :Float			{ return (parent == null) ? _t.scaleY : _t.scaleY + parent.scaleY; }
+	private function get_x() 						:Float 		{ return (parent == null) ? _t.x : _t.x + parent.x; }
+	private function get_y() 						:Float 		{ return (parent == null) ? _t.y : _t.y + parent.y; }
+	private function get_ix() 						:Int		{ return (parent == null) ? _t.ix : _t.ix + parent.ix; }
+	private function get_iy() 						:Int		{ return (parent == null) ? _t.iy : _t.iy + parent.iy; }
+	private function get_z() 						:Float 		{ return (parent == null) ? _t.z : _t.z + parent.z; }
+	private function get_rotation() 				:Float 		{ return (parent == null) ? _t.rotation : _t.rotation + parent.rotation; }
+	private function get_scaleX() 					:Float 		{ return (parent == null) ? _t.scaleX : _t.scaleX + parent.scaleX; }
+	private function get_scaleY() 					:Float		{ return (parent == null) ? _t.scaleY : _t.scaleY + parent.scaleY; }
+	private function get_transform() 				:Transform 	{ return _t; }
+	
+	private function get_vx()						:Float		{ return (_m == null) ? 0 : (parent == null) ? _m.vx : _m.vx + parent.vx; }
+	private function get_vy()						:Float		{ return (_m == null) ? 0 : (parent == null) ? _m.vy : _m.vy + parent.vy; }
+	private function get_ax()						:Float		{ return (_m == null) ? 0 : (parent == null) ? _m.ax : _m.ax + parent.ax; }
+	private function get_ay()						:Float		{ return (_m == null) ? 0 : (parent == null) ? _m.ay : _m.ay + parent.ay; }
+	private function get_fx()						:Float		{ return (_m == null) ? 0 : (parent == null) ? _m.fx : _m.fx + parent.fx; }
+	private function get_fy()						:Float		{ return (_m == null) ? 0 : (parent == null) ? _m.fy : _m.fy + parent.fy; }
+	private function get_av()						:Float		{ return (_m == null) ? 0 : (parent == null) ? _m.angularVelocity : _m.angularVelocity + parent.av; }
+	private function get_aa()						:Float		{ return (_m == null) ? 0 : (parent == null) ? _m.angularAcceleration : _m.angularAcceleration + parent.aa; }
+	private function get_af()						:Float		{ return (_m == null) ? 0 : (parent == null) ? _m.angularFriction : _m.angularFriction + parent.af; }
+	private function get_motion()					:Motion		{ return _m; }
 		
-	private function set_x( x:Float ) :Float 	{ return _t.x = (parent == null) ? x : x - parent.x; }
-	private function set_y( y:Float ) :Float 	{ return _t.y = (parent == null) ? y : y - parent.y; }
-	private function set_ix( x:Int ) :Int		{ return _t.ix = (parent == null) ? x : x - parent.ix; }
-	private function set_iy( y:Int ) :Int		{ return _t.iy = (parent == null) ? y : y - parent.iy; }
-	private function set_r( r:Float ) :Float 	{ return _t.rotation = (parent == null) ? r : r - parent.rotation; }
-	private function set_sx( sx:Float ) :Float 	{ return _t.scaleX = (parent == null) ? sx : sx - parent.scaleX; }
-	private function set_sy( sy:Float ) :Float 	{ return _t.scaleY = (parent == null) ? sy : sy - parent.scaleY; }
+	private function get_visible() 					:Bool 		{ return _visible; }
+	private function get_active() 					:Bool 		{ return _active; }
 	
-	private function get_t() :Transform 				{ return _t; }
-	private function get_m() :Motion 					{ return _m; }
-	private function set_t( t:Transform ) :Transform 	{ return _t = t; }
-	private function set_m( m:Motion ) :Motion 			{ return _m = m; }
 	
-	private function get_visible() :Bool 				{ return _visible; }
-	private function set_visible( visible:Bool ) :Bool 	{ return _visible = visible; }
+	private function set_x( x:Float ) 				:Float 		{ return _t.x = (parent == null) ? x : x - parent.x; }
+	private function set_y( y:Float ) 				:Float 		{ return _t.y = (parent == null) ? y : y - parent.y; }
+	private function set_ix( x:Int ) 				:Int		{ return _t.ix = (parent == null) ? x : x - parent.ix; }
+	private function set_iy( y:Int ) 				:Int		{ return _t.iy = (parent == null) ? y : y - parent.iy; }
+	private function set_z( z:Float ) 				:Float 		{ return _t.z = (parent == null) ? z : z - parent.z; }
+	private function set_rotation( r:Float ) 		:Float 		{ return _t.rotation = (parent == null) ? r : r - parent.rotation; }
+	private function set_scaleX( sx:Float ) 		:Float 		{ return _t.scaleX = (parent == null) ? sx : sx - parent.scaleX; }
+	private function set_scaleY( sy:Float ) 		:Float 		{ return _t.scaleY = (parent == null) ? sy : sy - parent.scaleY; }
+	private function set_transform( t:Transform ) 	:Transform 	{ return _t = t; }
 	
-	private function get_active() :Bool 				{ return _active; }
-	private function set_active( active:Bool ) :Bool 	{ return _active = active; }
+	private function set_vx( vx:Float )				:Float		{ return (_m == null) ? 0 : _m.vx = (parent == null) ? vx : vx - parent.vx; }
+	private function set_vy( vy:Float )				:Float		{ return (_m == null) ? 0 : _m.vy = (parent == null) ? vy : vy - parent.vy; }
+	private function set_ax( ax:Float )				:Float		{ return (_m == null) ? 0 : _m.ax = (parent == null) ? ax : ax - parent.ax; }
+	private function set_ay( ay:Float )				:Float		{ return (_m == null) ? 0 : _m.ay = (parent == null) ? ay : ay - parent.ay; }
+	private function set_fx( fx:Float )				:Float		{ return (_m == null) ? 0 : _m.fx = (parent == null) ? fx : fx - parent.fx; }
+	private function set_fy( fy:Float )				:Float		{ return (_m == null) ? 0 : _m.fy = (parent == null) ? fy : fy - parent.fy; }
+	private function set_av( av:Float )				:Float		{ return (_m == null) ? 0 : _m.angularVelocity = (parent == null) ? av : av - parent.av; }
+	private function set_aa( aa:Float )				:Float		{ return (_m == null) ? 0 : _m.angularAcceleration = (parent == null) ? aa : aa - parent.aa; }
+	private function set_af( af:Float )				:Float		{ return (_m == null) ? 0 : _m.angularFriction = (parent == null) ? af : af - parent.af; }
+	private function set_motion( m:Motion )			:Motion		{ return _m = m; }	
+	
+	private function set_visible( visible:Bool ) 	:Bool 		{ return _visible = visible; }
+	private function set_active( active:Bool ) 		:Bool 		{ return _active = active; }
 	
 	
 	
 	/*
 	 * IHasBounds 
 	 */
-	public function getBounds() :AABB
+	public function get_bounds() :AABB
 	{
 		if (collider == null)  
 			return null; 
 		else
-			return collider.getBounds();
+			return collider.get_bounds();
 	}
 	/*
 	 * IHasId 
 	 */
-	public function getId() :Int
+	public function get_id() :Int
 	{
 		return id;
 	}

@@ -1,5 +1,9 @@
 package sge.core;
 
+import haxe.ds.IntMap;
+
+import sge.collision.AABB; 
+
 /**
  * Quad Tree Entity Manager
  * 
@@ -7,17 +11,137 @@ package sge.core;
  * quad in the tree based on the entities bounding box.
  * Entities can be queried based on a bounding area.
  * 
+ * TODO: create a FAST collision test solution that takes advantage of the fact this is a quad tree...
+ * 
  * @author fidgetwidget
- */
+ */ 
+class EntityTree extends EntityManager
+{
+	
+	/*
+	 * Properties
+	 */
+	public var MAX_DEPTH:Int;
+	public var WIDTH:Int;
+	public var HEIGHT:Int;
+	public var root:QuadNode;
+	
+	/*
+	 * Members
+	 */
+	private var _entity_node:IntMap<QuadNode>;
+	private var _node:QuadNode;
+	private var _aabb:AABB;
+	private var _count:Int = 0;
+	
+	/**
+	 * Constructor
+	 * @param	width - the width of the largest node (a fixed value)
+	 * @param	height - the height of the largest node (a fixed value)
+	 */
+	public function new(width:Int = 1024, height:Int = 1024, max_depth:Int = 6) 
+	{
+		super();
+		
+		WIDTH = width;
+		HEIGHT = height;
+		MAX_DEPTH = max_depth;		
 
- //TODO: using physics test as an example, create this entity manager
- 
-import com.eclecticdesignstudio.motion.easing.Quad;
-import haxe.FastList;
-import nme.geom.Point;
-import sge.physics.AABB;
+		root = new QuadNode(0, 0, WIDTH, HEIGHT, this);
+		_bounds = root;		
+		
+		_entity_node = new IntMap<QuadNode>();
+		_count = 0;
+	}
+	
+	
+	// add the entity to the appropriate cells based on its bounds
+	private override function _addEntity( e:Entity ) :Void 
+	{		
+		_aabb = e.get_bounds();
+		if (!_bounds.containsAabb(_aabb)) {
+			Engine.free(e);
+			return; //throw "Entity's Bounds are out of range of this EntityTree.";
+		}
+		_node = root.addEntity(e);
+		_entity_node.set(e.id, _node);
+		_count++;
+	} 
 
-class QuadNode extends AABB {
+	// remove the entity from all the cells its in
+	private override function _removeEntity( e:Entity ) :Void 
+	{ 
+		_node = _entity_node.get(e.id);
+		if (_node == null) {
+			return; // throw "Entity Not Found";
+		}
+		_node.removeEntity(e);
+		_entity_node.remove(e.id);
+		_count--;
+	}
+	
+	// Quick and dirty remove it from all cells, add it in again
+	public function updateEntityPosition( e:Entity ) :Void 
+	{
+		_removeEntity(e);
+		_addEntity(e);
+	}
+	
+	// return an array of all entities in the given query area
+	public function getEntities( queryArea:AABB, array:Array<Entity> = null ) :Array<Entity>
+	{
+		if (array == null) {
+			array = new Array<Entity>();
+		}
+		
+		root.getEntities( queryArea, array );
+		
+		return array;
+	}
+	
+	public function getSmallestFit( bounds:AABB ) :QuadNode
+	{
+		return root.getSmallestFit( bounds );
+	}
+	
+	public function getNode( e:Entity ) :QuadNode
+	{
+		if ( !_entity_node.exists( e.id ) ) 
+			return null;
+		return _entity_node.get( e.id );
+	}
+	
+	/*
+	 * AABB functions 
+	 */
+	public function containsAabb( aabb:AABB ) :Bool
+	{
+		return _bounds.containsAabb(aabb);
+	}
+	
+	public function containsPoint( x:Float, y:Float ) :Bool
+	{
+		return _bounds.containsPoint(x, y);
+	}
+	
+	public function intersectsAabb( aabb:AABB ) :Bool
+	{
+		return _bounds.intersectsAabb(aabb);
+	}	
+	
+	/*
+	 * Helper functions
+	 */
+	
+	
+	/*
+	 * Getters & Setters
+	 */		
+	private override function get_count() :Int { return _count; }	
+}
+
+class QuadNode extends AABB 
+{
 	
 	/*
 	 * Properties
@@ -27,9 +151,9 @@ class QuadNode extends AABB {
 	public var children:Array<QuadNode>;
 	public var depth(default, null):Int;
 	
-	public var items:IntHash<Entity>;
-	public var isEmpty(get_isEmpty, never):Bool;
-	public var canDevide(get_canDevide, never):Bool;
+	public var items:IntMap<Entity>;
+	public var isEmpty(get, never):Bool;
+	public var canDevide(get, never):Bool;
 	
 	/*
 	 * Members
@@ -70,7 +194,7 @@ class QuadNode extends AABB {
 		}
 		
 		// Find the best fit
-		_bounds = e.getBounds();
+		_bounds = e.get_bounds();
 		for (child in children) {
 			if (child.containsAabb(_bounds)) {
 				return child.addEntity(e);
@@ -86,7 +210,7 @@ class QuadNode extends AABB {
 	private function _addEntity( e:Entity ) :QuadNode
 	{
 		if (items == null) {
-			items = new IntHash<Entity>();
+			items = new IntMap<Entity>();
 			_items = new Array<Entity>();
 		}
 		items.set(e.id, e);
@@ -222,35 +346,33 @@ class QuadNode extends AABB {
 		_itt_index = 0;
 		_itt_curChild = 0;
 		_itt_result = null;
-		
 		if (_devided) {
 			for (child in children)
 			{
 				child.iterator();
 			}
-		}
+		}		
 		
 		return this;
 	}
 	
 	public function hasNext() :Bool
-	{
-		if (_items != null && _items.length > _itt_index) {
+	{		
+		
+		if ( _items != null && _items.length > _itt_index ) {
 			return true;
 		} else
-		if (children == null) {
-			return false;
-		}
+		if ( children != null ) {
 		
-		while (children.length > _itt_curChild) {
-			
-			if (children[_itt_curChild] != null && children[_itt_curChild].hasNext()) {
-				return true; 
-			} else {
-				_itt_curChild++;
-			}			
-		}
-		
+			while ( children.length > _itt_curChild ) {
+				
+				if ( children[_itt_curChild] != null && children[_itt_curChild].hasNext() ) {
+					return true; 
+				} else {
+					_itt_curChild++;
+				}			
+			}				
+		}		
 		return false;
 		
 	}
@@ -258,156 +380,30 @@ class QuadNode extends AABB {
 	public function next() :Entity
 	{
 		// do we have any items in this quad?
-		if (_items != null && _items.length > _itt_index)
+		if ( _items != null && _items.length > _itt_index )
 		{
 			_itt_result = _items[_itt_index];
 			_itt_index++;
 			return _itt_result;
 		} else
-		if (children == null) {
-			return null;
+		if ( children != null ) {
+			
+			// do we have any children that have items?
+			while (children.length > _itt_curChild) {
+				// test the current child for an item
+				if (children[_itt_curChild] != null && children[_itt_curChild].hasNext()) 
+				{ 
+					return children[_itt_curChild].next();
+				}
+				_itt_curChild++;
+			}	
+			
 		}
 		
-		// do we have any children that have items?
-		while (children.length > _itt_curChild) {
-			// test the current child for an item
-			if (children[_itt_curChild] != null && children[_itt_curChild].hasNext()) 
-			{ 
-				return children[_itt_curChild].next();
-			}
-			_itt_curChild++;
-		}		
-		
-		// if nothing else worked, we are out of items
 		return null;
 	}
-	
 	private var _itt_index:Int = 0;
 	private var _itt_curChild:Int = 0;
 	private var _itt_result:Entity;
 	/// ------------------------------------------------------------------------------------
-}
-
- 
-class EntityTree extends EntityManager
-{
-	
-	/*
-	 * Properties
-	 */
-	public var MAX_DEPTH:Int;
-	public var WIDTH:Int;
-	public var HEIGHT:Int;
-	public var root:QuadNode;
-	
-	/*
-	 * Members
-	 */
-	private var _entity_node:IntHash<QuadNode>;
-	private var _node:QuadNode;
-	private var _aabb:AABB;
-	
-	/**
-	 * Constructor
-	 * @param	width - the width of the largest node (a fixed value)
-	 * @param	height - the height of the largest node (a fixed value)
-	 */
-	public function new(width:Int = 1024, height:Int = 1024, max_depth:Int = 6) 
-	{
-		super();
-		
-		WIDTH = width;
-		HEIGHT = height;
-		MAX_DEPTH = max_depth;		
-
-		root = new QuadNode(0, 0, WIDTH, HEIGHT, this);
-		_bounds = root;
-		
-		_entity_node = new IntHash<QuadNode>();
-	}
-	
-	
-	// add the entity to the appropriate cells based on its bounds
-	private override function _addEntity( e:Entity ) :Void 
-	{		
-		_aabb = e.getBounds();
-		if (!_bounds.containsAabb(_aabb)) {
-			throw "Entity's Bounds are out of range of this EntityTree.";
-		}
-		_node = root.addEntity(e);
-		_entity_node.set(e.id, _node);
-	} 
-
-	// remove the entity from all the cells its in
-	private override function _removeEntity( e:Entity ) :Void 
-	{ 
-		_node = _entity_node.get(e.id);
-		_node.removeEntity(e);
-		_entity_node.remove(e.id);
-	}
-	
-	// Quick and dirty remove it from all cells, add it in again
-	public function updateEntityPosition( e:Entity ) :Void 
-	{
-		_removeEntity(e);
-		_addEntity(e);
-	}
-	
-	// return an array of all entities in the given query area
-	public function getEntities( queryArea:AABB, array:Array<Entity> = null ) :Array<Entity>
-	{
-		if (array == null) {
-			array = new Array<Entity>();
-		}
-		
-		root.getEntities( queryArea, array );
-		
-		return array;
-	}
-	
-	public function getSmallestFit( bounds:AABB ) :QuadNode
-	{
-		return root.getSmallestFit( bounds );
-	}
-	
-	public function getNode( e:Entity ) :QuadNode
-	{
-		if ( !_entity_node.exists( e.id ) ) 
-			return null;
-		return _entity_node.get( e.id );
-	}
-	
-	/*
-	 * AABB functions 
-	 */
-	public function containsAabb( aabb:AABB ) :Bool
-	{
-		return _bounds.containsAabb(aabb);
-	}
-	
-	public function containsPoint( x:Float, y:Float ) :Bool
-	{
-		return _bounds.containsPoint(x, y);
-	}
-	
-	public function intersectsAabb( aabb:AABB ) :Bool
-	{
-		return _bounds.intersectsAabb(aabb);
-	}
-	
-	
-	/*
-	 * Helper functions
-	 */
-	
-	
-	/*
-	 * Getters & Setters
-	 */
-		
-	private override function get_count() :Int 
-	{
-		return 0;
-	}
-	
 }

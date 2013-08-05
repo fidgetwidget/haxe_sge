@@ -61,7 +61,7 @@ class Motion
 		if (delta < 0 || Math.isNaN(delta)) { return t; }
 		
 		if (updateMotion)
-			update( delta * 0.5 );
+			update( delta * 0.5, true );
 		
 		// allow for self update only
 		if (t != null) {
@@ -71,21 +71,21 @@ class Motion
 		}
 		
 		if (updateMotion)
-			update( delta * 0.5 );
+			update( delta * 0.5, true );
 		
 		return t;
 	}
 	
 	// Update the velocity with acceleration and friction 
-	public function update( delta:Float ) :Void {
+	public function update( delta:Float, half:Bool = false ) :Void {
 		
-		_updateLinear( delta );		
-		_updateRotation( delta );
+		_updateLinear( delta, half );		
+		_updateRotation( delta, half );
 		_constrain(); // make sure the velocity is within the set bounds
 	}
 	
 	// Update the x,y velocity
-	private function _updateLinear( delta:Float ) :Void 
+	private function _updateLinear( delta:Float, half:Bool = false ) :Void 
 	{
 		// apply acceleration
 		if (_a.y != 0 || _a.x != 0) {
@@ -95,27 +95,31 @@ class Motion
 		// apply friction
 		if (_f.x != 0 && _v.x != 0) {	
 			if (_v.x > 0)
-				_v.x -= Math.abs(_v.x) * _f.x;
+				_v.x -= Math.abs(_v.x) * _f.x * (half ? 0.5 : 1);
 			else 
-				_v.x += Math.abs(_v.x) * _f.x;
+				_v.x += Math.abs(_v.x) * _f.x * (half ? 0.5 : 1);
 		}
 		if (_f.y != 0 && _v.y != 0) {
 			if (_v.y > 0)
-				_v.y -= Math.abs(_v.y) * _f.y;
+				_v.y -= Math.abs(_v.y) * _f.y * (half ? 0.5 : 1);
 			else 
-				_v.y += Math.abs(_v.y) * _f.y;
+				_v.y += Math.abs(_v.y) * _f.y * (half ? 0.5 : 1);
 		}		
 	}
 	// Update the angular velocity
-	private function _updateRotation( delta:Float ) :Void 
+	private function _updateRotation( delta:Float, half:Bool = false ) :Void 
 	{
 		// apply acceleration
 		if ( angularAcceleration != 0 ) {
 			angularVelocity += angularAcceleration * delta;
 		}
 		// apply friction
-		if ( angularFriction != 0 ) {
-			angularVelocity -= angularVelocity * angularFriction * delta;
+		if ( angularVelocity != 0 && angularFriction != 0 ) {
+			if ( angularVelocity > 0 ) {
+				angularVelocity -= Math.abs(angularVelocity) * angularFriction * (half ? 0.5 : 1);
+			} else {
+				angularVelocity += Math.abs(angularVelocity) * angularFriction * (half ? 0.5 : 1);
+			}
 		}		
 		
 	}

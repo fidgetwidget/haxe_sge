@@ -1,25 +1,19 @@
 package sge.lib;
-import nme.errors.Error;
+
+import haxe.ds.StringMap;
 
 /**
- * A collection of name value pair properties
- * 
+ * ...
  * @author fidgetwidget
  */
 class Properties
 {
 
-	private var nameValHash:Hash<Dynamic>;
+	private var nameValHash:StringMap<Dynamic>;
 	
 	public function new() 
 	{
-		nameValHash = new Hash<Dynamic>();		
-	}
-	
-	public function set( properties:Array<NameValuePair> ) :Void {
-		for (p in properties) {
-			nameValHash.set(p.name, p.value);
-		}
+		nameValHash = new StringMap<Dynamic>();		
 	}
 	
 	public function add( name:String, value:Dynamic ) :Void {
@@ -31,13 +25,6 @@ class Properties
 			return nameValHash.get(name);
 		}
 		return null;
-	}
-	
-	public function getPair( name:String ) :NameValuePair {
-		if (hasValue(name)) {
-			return { name:name, value:nameValHash.get(name) };
-		}
-		return { name:"", value:null };
 	}
 	
 	public function hasValue( name:String ) :Bool {

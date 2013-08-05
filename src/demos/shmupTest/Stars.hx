@@ -2,8 +2,8 @@ package demos.shmupTest;
 
 import flash.display.Shape;
 import sge.graphics.Camera;
-import sge.graphics.Emitter;
-import sge.graphics.Particle;
+import sge.particles.Emitter;
+import sge.particles.Particle;
 import sge.math.Motion;
 import sge.math.Random;
 import sge.math.Transform;
@@ -17,14 +17,15 @@ class Stars extends Emitter
 	
 	public var area_width:Float = 0;
 	public var area_height:Float = 0;
-	var shape:Shape;
+	
+	var shape:Shape;	
 
 	public function new() 
 	{
 		super();
 		shape = new Shape();
 		mc = shape;
-		init();
+		init(200);
 	}
 	
 	override public function start(reset:Bool = true):Void 
@@ -46,7 +47,7 @@ class Stars extends Emitter
 		
 		for (p in _particles) {
 			p.update( delta );
-			if (p.transform.y > area_height) {
+			if (p.y > area_height) {
 				p.die();
 			}
 		}
@@ -65,8 +66,8 @@ class Stars extends Emitter
 		shape.graphics.clear();
 		shape.graphics.lineStyle(1, 0xFFFFFF);
 		for (p in _particles) {
-			shape.graphics.moveTo( (p.transform.x - camera.x) - (p.transform.z * (camera.cx - p.transform.x)), p.transform.y );
-			shape.graphics.lineTo( (p.transform.x - camera.x) - (p.transform.z * (camera.cx - p.transform.x)), p.transform.y + p.transform.z * 6 );
+			shape.graphics.moveTo( (p.x - camera.x) - (p.z * (camera.cx - p.x)), (p.y - camera.y) );
+			shape.graphics.lineTo( (p.x - camera.x) - (p.z * (camera.cx - p.x)), (p.y - camera.y) + (p.z * 8) );
 		}
 	}
 	
@@ -80,13 +81,14 @@ class Stars extends Emitter
 		if (p.motion == null) {
 			p.motion = new Motion();
 		}
-		var zz = Random.instance.between(25, 50);
-		p.transform.x = Random.instance.between(0, area_width);
-		p.transform.y = Random.instance.between(0, area_height);
-		p.transform.z = -(zz* 0.01);
-		p.motion.vy = zz * 5;
-		p.motion.fx = 0;
-		p.motion.fy = 0;
+		var zz = Random.instance.between(10, 30);
+		p.x = Random.instance.between(0, area_width);
+		p.y = Random.instance.between(0, area_height);
+		p.z = -(zz* 0.01);
+		p.vy = zz * 6;
+		p.ay = zz;
+		p.fx = 0;
+		p.fy = 0;
 		
 	}
 	
@@ -100,13 +102,14 @@ class Stars extends Emitter
 		if (p.motion == null) {
 			p.motion = new Motion();
 		}
-		var zz = Random.instance.between(25, 50);
-		p.transform.x = Random.instance.between(0, area_width);
-		p.transform.y = 0;
-		p.transform.z = -(zz* 0.01);
-		p.motion.vy = zz * 5;
-		p.motion.fx = 0;
-		p.motion.fy = 0;
+		var zz = Random.instance.between(10, 30);
+		p.x = Random.instance.between(0, area_width);
+		p.y = 0;
+		p.z = -(zz* 0.01);
+		p.vy = zz * 6;
+		p.ay = zz;
+		p.fx = 0;
+		p.fy = 0;
 	}
 	
 }

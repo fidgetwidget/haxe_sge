@@ -1,6 +1,10 @@
 package demos.platformTest;
 
+import etc.PauseScreen;
 import flash.display.Sprite;
+import flash.text.TextField;
+import flash.text.TextFormat;
+import flash.text.TextFormatAlign;
 import flash.ui.Keyboard;
 import openfl.display.Tilesheet;
 
@@ -31,6 +35,8 @@ class TestScene extends Scene
 	static var GRID_WIDTH:Int = 1024;
 	static var GRID_HEIGHT:Int = 1024;
 	
+	var controlsTxtFld:TextField;
+	var ps:PauseScreen;
 	var grid:EntityGrid;
 	var world:World;
 	var bounds:AABB;
@@ -51,7 +57,8 @@ class TestScene extends Scene
 	public function new() 
 	{
 		super();		
-		id = "PlatformTest";		
+		id = "PlatformTest";
+		
 		atlas = new Atlas();
 		
 		// Setup the Entity Manager
@@ -79,8 +86,17 @@ class TestScene extends Scene
 		player.x = 100;
 		player.y = 100;
 		player.world = world;
-		
+
 		tileCursor = 2;
+		ps = new PauseScreen( this );
+		ps.text = "Paused\rPress 'P' to resume.";
+		
+		controlsTxtFld = new TextField();
+		controlsTxtFld.defaultTextFormat = new TextFormat("_sans", 16, 0xEEEEEE);
+		controlsTxtFld.text = "WASD movement, SPACE or W for jump, S for crouch.\rMouse Click to place tiles.";
+		controlsTxtFld.width = controlsTxtFld.textWidth;
+		controlsTxtFld.x = 0;
+		controlsTxtFld.y = camera.height - controlsTxtFld.textHeight;
 	}
 	
 	
@@ -91,8 +107,12 @@ class TestScene extends Scene
 		mc = atlas.makeLayer(0);
 		
 		add( player );
-		mc.addChild( player.mc );
+		mc.addChild( player.mc );	
 		
+		if (paused) {
+			ps.show();
+			mc.addChildAt(controlsTxtFld, mc.numChildren);
+		}		
 	}
 	
 	override private function _update(delta:Float):Void 
@@ -105,14 +125,28 @@ class TestScene extends Scene
 		if ( !bounds.containsAabb( player.get_bounds() ) ) {
 			resetPlayer();
 		}
+		
+		camera.moveTo( player.x, player.y, 0.3);
 	}
 	
 	
 	override private function _handleInput(delta:Float) : Void 
 	{
 		localX = Input.mouseX + camera.x;
-		localY = Input.mouseY + camera.y;		
-
+		localY = Input.mouseY + camera.y;	
+		
+		if ( Input.isKeyPressed( Keyboard.P ) ) {
+			paused = !paused;
+			if (paused) {
+				ps.show();
+				mc.addChildAt(controlsTxtFld, mc.numChildren);
+			} else {
+				ps.hide();
+				mc.removeChild(controlsTxtFld);
+			}
+		}
+		
+		
 		if ( Input.isMouseDown() && Input.isKeyDown( Keyboard.SPACE ) ) {
 			
 			if ( Input.isMousePressed() )
@@ -133,17 +167,14 @@ class TestScene extends Scene
 			world.makeTileAt(localX, localY, tileCursor);
 		}
 		
-		if ( Input.isKeyPressed( Keyboard.P ) ) {
-			paused = !paused;
-		}
-		
 		if ( Input.isKeyPressed( Keyboard.R ) ) {
 			resetPlayer();
 		}
 	}	
 	
 	override public function render() : Void 
-	{		
+	{
+		
 		bounds = grid.get_bounds();
 		
 		// draw the outer quad tree square
@@ -161,6 +192,13 @@ class TestScene extends Scene
 		//for ( e in _entities ) {
 			//e.render( camera );
 		//}
+		
+		Draw.graphics.lineStyle(1, 0xFF0000);
+		Draw.debug_drawAABB( bounds, camera );
+		
+		if (paused) {			
+			ps.render();
+		}
 	}
 	
 	

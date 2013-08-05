@@ -143,7 +143,14 @@ class Camera
 		Actuate.stop( _offset );
 		_offset.x = 0;
 		_offset.y = 0;
-		Actuate.tween( _offset, (_shakeDuration / _shakeFrequency) * 0.5, { x:_shakeTarget.x, y:_shakeTarget.y } ).onComplete( _shakeComplete );
+		Actuate.tween( _offset, (_shakeDuration / _shakeFrequency) * 0.5, { x:_shakeTarget.x, y:_shakeTarget.y } ).onUpdate( _shakeCheck ).onComplete( _shakeComplete );
+	}
+	
+	// There is the occasional "glitch" that occurs, but this fixed that.
+	private function _shakeCheck() :Void 
+	{
+		if (Math.isNaN(_offset.x)) { _offset.x = 0; }
+		if (Math.isNaN(_offset.y)) { _offset.y = 0; }
 	}
 	
 	private function _shakeComplete() :Void 

@@ -1,9 +1,9 @@
 package sge.graphics;
 
-import nme.geom.Point;
-import nme.geom.Rectangle;
-import nme.display.BitmapData;
-import nme.display.Tilesheet;
+import flash.display.BitmapData;
+import flash.geom.Point;
+import flash.geom.Rectangle;
+import openfl.display.Tilesheet;
 
 /**
  * an expansion to the tilesheet class
@@ -19,20 +19,28 @@ class Tileset
 	/*
 	 * Properties
 	 */
-	public var source(default, null):BitmapData;
-	public var tilesheet(default, null):Tilesheet;
-	public var tileCount(default, null):Int = 0;
+	public var source		(default, null)	: BitmapData;
+	public var tilesheet	(default, null)	: Tilesheet;
+	public var tileCount	(default, null)	: Int = 0;
 	
+	/// Memory Saver
+	private var r:Int;
+	private var c:Int;
 
+	/**
+	 * Constructor
+	 * @param	bitmap
+	 */
 	public function new( bitmap:BitmapData ) 
 	{
 		source = bitmap;
 		tilesheet = new Tilesheet( source );
 	}
 	
-	public function init( tileWidth:Int, tileHeight:Int, rows:Int, cols:Int ) {
-		var r = 0;
-		var c = 0;
+	public function init( tileWidth:Int, tileHeight:Int, rows:Int, cols:Int ) 
+	{
+		r = 0;
+		c = 0;
 		while (r < rows) {
 			while (c < cols) {
 				addTile(c * tileWidth, r * tileHeight, tileWidth, tileHeight);

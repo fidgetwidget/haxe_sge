@@ -19,7 +19,7 @@ import sge.math.Dice;
 import sge.math.Random;
 import sge.geom.Path;
 
-import sge.graphics.Emitter;
+import sge.particles.Emitter;
 
 /**
  * Draw a number of basic shapes in a space, and allow dragging of the scene
@@ -38,6 +38,7 @@ class TestScene extends Scene
 	
 	var drawQuads:Bool = false;
 	var drawBounds:Bool = false;
+	var drawStars:Bool = true;
 	var paused:Bool = false;
 	
 	var localX:Float;
@@ -105,7 +106,9 @@ class TestScene extends Scene
 		stars.area_width = TREE_WIDTH;
 		stars.area_height = TREE_HEIGHT;
 		stars.start();
-		bg.addChild( stars.mc );
+		
+		if (drawStars)
+			bg.addChild( stars.mc );
 		
 	}
 	
@@ -120,11 +123,21 @@ class TestScene extends Scene
 			shoot();
 		}
 		
+		if ( Input.isKeyPressed( Keyboard.NUMBER_1 ) ) {
+			drawStars = !drawStars;
+			if (!drawStars) {
+				bg.removeChild( stars.mc );
+			} else {
+				bg.addChild( stars.mc );
+			}
+		}
+		
 	}	
 	
 	override private function _update( delta:Float ) : Void 
 	{
-		stars.update( delta );
+		if (drawStars)
+			stars.update( delta );
 		
 		if (shotDelay > 0) {
 			shotDelay -= delta;
@@ -173,6 +186,7 @@ class TestScene extends Scene
 							if (cast(e, Enemy).hit()) {
 								
 								fg.removeChild(e.mc);
+								makeExplosion(_bounds.cx, _bounds.cy, e.transform.z);
 								remove(e, true);
 								
 							}
@@ -191,6 +205,18 @@ class TestScene extends Scene
 		}
 		
 		CollisionMath.freeCollisionData(cdata);	
+		
+		if (_explosions != null) {
+			for (e in _explosions) {
+				e.update( delta );
+				if (e.life <= 0) {
+					_explosionPool.push( e );
+					_explosions.remove(e);
+					bg.removeChild(e.mc);
+				}
+			}
+		}
+		
 		
 		if (player.x < LEFT_LIMIT) {
 			player.x = LEFT_LIMIT;
@@ -220,7 +246,8 @@ class TestScene extends Scene
 			e.render( camera );	
 		}
 		
-		stars.render( camera );
+		if (drawStars) 
+			stars.render( camera );
 		
 		// White wall off the outside areas
 		Draw.graphics.beginFill(0xFFFFFF);
@@ -234,6 +261,13 @@ class TestScene extends Scene
 		Draw.graphics.lineTo( LEFT_LIMIT - player.SIZE - camera.x, TREE_HEIGHT - camera.y);
 		Draw.graphics.moveTo(RIGHT_LIMIT + player.SIZE - camera.x, 0 - camera.y);
 		Draw.graphics.lineTo(RIGHT_LIMIT + player.SIZE - camera.x, TREE_HEIGHT - camera.y);
+		
+		
+		if (_explosions != null) {
+			for (e in _explosions) {
+				e.render( camera );
+			}
+		}
 		
 	}
 	private var quad:QuadNode;
@@ -250,11 +284,36 @@ class TestScene extends Scene
 	
 	private function spawn() :Void {
 		var x = Random.instance.between(LEFT_LIMIT + 10, RIGHT_LIMIT - 10);
-		var y = camera.bounds.top - 10;
+		var y = camera.bounds.top - 40;
 		
 		var enemy:Enemy = Enemy.makeEnemy( x, y );
 		add(enemy);
 		fg.addChild( enemy.mc );
 	}
+	
+	private function makeExplosion( x:Float, y:Float, z:Float ) :Void {
+		
+		var vy = 150; // simulate the speed of the player
+		if (_explosions == null) { _explosions = new Array<Explosion>(); }
+		if (_explosionPool == null) { _explosionPool = new Array<Explosion>(); }
+		
+		if (_explosionPool.length > 0) {
+			_explosion = _explosionPool.pop();
+			_explosion.reset( x, y, z, vy );
+		} else {
+			_explosion = new Explosion( x, y, z, vy );
+			
+		}
+		bg.addChild( _explosion.mc );
+		_explosions.push( _explosion );
+		_explosion.start();
+		
+		camera.shake(0.66, 10, 10);
+		
+	}
+	
+	private var _explosionPool:Array<Explosion>;
+	private var _explosions:Array<Explosion>;
+	private var _explosion:Explosion;
 	
 }
