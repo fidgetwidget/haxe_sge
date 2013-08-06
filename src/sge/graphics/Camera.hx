@@ -23,41 +23,41 @@ class Camera
 	 * Properties
 	 */
 
-	public var sceneBounds:AABB;
-	public var bounds:AABB;
+	public var sceneBounds 			: AABB;
+	public var bounds 				: AABB;
 	
-	public var x(get_x, set_x):Float;
-	public var y(get_y, set_y):Float;
-	public var ix(get_ix, never):Int;
-	public var iy(get_iy, never):Int;
-	public var center(get_center, never) :Vector2D;
-	public var cx(get_cx, set_cx):Float;
-	public var cy(get_cy, set_cy):Float;
-	public var width(get_width, set_width):Float;
-	public var height(get_height, set_height):Float;
+	public var x(get, set)			: Float;
+	public var y(get, set)			: Float;
+	public var ix(get, never)		: Int;
+	public var iy(get, never)		: Int;
+	public var center(get, never)	: Vector2D;
+	public var cx(get, set)			: Float;
+	public var cy(get, set)			: Float;
+	public var width(get, set)		: Float;
+	public var height(get, set)		: Float;
 	
-	public var useParalax:Bool;
+	public var useParalax 			: Bool;
 	
 	/*
 	 * Members
 	 */
-	private var _offset:Vector2D;
-	private var _shakeDuration:Float;
-	private var _shakeIntensity:Float;	
-	private var _shakeFrequency:Int;
-	private var _shakeTarget:Vector2D;
-	private var _shakeCount:Int;
+	private var _offset 			: Vector2D;
+	private var _shakeDuration 		: Float;
+	private var _shakeIntensity 	: Float;	
+	private var _shakeFrequency 	: Int;
+	private var _shakeTarget 		: Vector2D;
+	private var _shakeCount 		: Int;
 	
-	private var _target:Vector2D;
-	private var _targetType:Int = 0;
-	private var _targetBounds:AABB;
-	private var _targetEase:IEasing;
-	private var _moveDuration:Float;
-	private var _currDuration:Float;
-	private var _targetZoom:Float;
-	private var _zoom:Float;	
-	private var _dx:Float;
-	private var _dy:Float;
+	private var _target 			: Vector2D;
+	private var _targetType 		: Int = 0;
+	private var _targetBounds 		: AABB;
+	private var _targetEase 		: IEasing;
+	private var _moveDuration 		: Float;
+	private var _currDuration 		: Float;
+	private var _targetZoom 		: Float;
+	private var _zoom 				: Float;	
+	private var _dx 				: Float;
+	private var _dy 				: Float;
 	
 	 
 	public function new() {	
@@ -109,7 +109,7 @@ class Camera
 			return;
 		}
 		if (easeType == null) { easeType = Linear.easeNone; }
-		Actuate.tween( bounds, time, { cx: x, cy: y } ).ease( easeType ).onUpdate( _tweenUpdate );
+		Actuate.tween( bounds.center, time, { x: x, y: y } ).ease( easeType ).onUpdate( _tweenUpdate );
 	}
 	
 	// adjust the camear to a zoom

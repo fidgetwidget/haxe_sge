@@ -1,6 +1,6 @@
 package ;
 
-import demos.collisionTest.TestScene;
+import demos.platformTest.TestScene;
 import flash.display.MovieClip;
 import flash.display.Graphics;
 

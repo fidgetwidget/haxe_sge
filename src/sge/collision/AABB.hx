@@ -20,24 +20,24 @@ class AABB implements IRecyclable
 	/*
 	 * Properties
 	 */
-	public var x(get_x, set_x)					: Float;	// Left
-	public var y(get_y, set_y)					: Float;	// Top
-	public var width(get_width, set_width) 		: Float;
-	public var height(get_height, set_height) 	: Float;
+	public var x(get, set)			: Float;	// Left
+	public var y(get, set)			: Float;	// Top
+	public var width(get, set) 		: Float;
+	public var height(get, set) 	: Float;
 	
-	public var cx(get_cx, set_cx)				: Float;
-	public var cy(get_cy, set_cy)				: Float;
-	public var center(get_center, set_center) 	: Vector2D;
-	public var hWidth(get_hWidth, never)		: Float;
-	public var hHeight(get_hHeight, never)		: Float;	
-	public var minX(get_minX, set_minX) 		: Float; 	// Left
-	public var maxX(get_maxX, set_maxX) 		: Float; 	// Right
-	public var minY(get_minY, set_minY)			: Float; 	// Top
-	public var maxY(get_maxY, set_maxY) 		: Float; 	// Bottom
-	public var left(get_left , set_left) 		: Float;
-	public var right(get_right, set_right) 		: Float;
-	public var top(get_top, set_top) 			: Float;
-	public var bottom(get_bottom, set_bottom) 	: Float;
+	public var cx(get, set)			: Float;
+	public var cy(get, set)			: Float;
+	public var center(get, set) 	: Vector2D;
+	public var hWidth(get, never)	: Float;
+	public var hHeight(get, never)	: Float;	
+	public var minX(get, set) 		: Float; 	// Left
+	public var maxX(get, set) 		: Float; 	// Right
+	public var minY(get, set)		: Float; 	// Top
+	public var maxY(get, set) 		: Float; 	// Bottom
+	public var left(get, set) 		: Float;
+	public var right(get, set) 		: Float;
+	public var top(get, set) 		: Float;
+	public var bottom(get, set) 	: Float;
 	
 	/*
 	 * Members
@@ -51,7 +51,7 @@ class AABB implements IRecyclable
 		_extents = new Vector2D();
 	}
 	
-	public function setRect(x:Float, y:Float, width:Float, height:Float, fromCenter:Bool = false ) :AABB
+	public function setRect( x:Float, y:Float, width:Float, height:Float, fromCenter:Bool = false ) :AABB
 	{		
 		_extents.x = width * 0.5;
 		_extents.y = height * 0.5;
@@ -60,10 +60,10 @@ class AABB implements IRecyclable
 		
 		return this;
 	}
-	public function set_centerHalfs( cx:Float, cy:Float, halfWidth:Float, halfHeight:Float ) :AABB
+	public function set_centerHalfs( center_x:Float, center_y:Float, halfWidth:Float, halfHeight:Float ) :AABB
 	{
-		_center.x = cx;
-		_center.y = cy;
+		_center.x = center_x;
+		_center.y = center_y;
 		_extents.x = halfWidth;
 		_extents.y = halfHeight;
 		return this;
@@ -79,10 +79,10 @@ class AABB implements IRecyclable
 	
 	public function combine( aabb:AABB ) :Void
 	{
-		var l:Float 	= Math.min(aabb.left, left);
-		var r:Float 	= Math.max(aabb.right, right);
-		var t:Float 	= Math.min(aabb.top, top);
-		var b:Float 	= Math.max(aabb.bottom, bottom); 
+		var l:Float = Math.min(aabb.left, left);
+		var r:Float = Math.max(aabb.right, right);
+		var t:Float = Math.min(aabb.top, top);
+		var b:Float = Math.max(aabb.bottom, bottom); 
 		_extents.x = (r - l) * 0.5;
 		_extents.y = (b - t) * 0.5;
 		_center.x = l + _extents.x;
@@ -90,10 +90,26 @@ class AABB implements IRecyclable
 	}
 	
 	// adjust the size and center from the given new side position
-	public function expandLeft( l:Float ) 	{ _extents.x = ((_center.x + _extents.x) - l) * 0.5; _center.x = l + _extents.x; }
-	public function expandRight( r:Float ) 	{ _extents.x = (r - (_center.x - _extents.x)) * 0.5; _center.x = r - _extents.x; }
-	public function expandTop( t:Float ) 	{ _extents.y = ((_center.y + _extents.y) - t) * 0.5; _center.y = t + _extents.y; }
-	public function expandBottom( b:Float ) { _extents.y = (b - (_center.y - _extents.y)) * 0.5; _center.y = b - _extents.y; }
+	public function expandLeft( l:Float ) 	
+	{ 
+		_extents.x = ((_center.x + _extents.x) - l) * 0.5; 
+		_center.x = l + _extents.x; 
+	}
+	public function expandRight( r:Float ) 	
+	{ 
+		_extents.x = (r - (_center.x - _extents.x)) * 0.5; 
+		_center.x = r - _extents.x; 
+	}
+	public function expandTop( t:Float ) 	
+	{ 
+		_extents.y = ((_center.y + _extents.y) - t) * 0.5; 
+		_center.y = t + _extents.y; 
+	}
+	public function expandBottom( b:Float ) 
+	{ 
+		_extents.y = (b - (_center.y - _extents.y)) * 0.5; 
+		_center.y = b - _extents.y; 
+	}
 	
 	/* Contains Functions */
 	public function containsPoint( x:Float, y:Float) :Bool
@@ -157,41 +173,46 @@ class AABB implements IRecyclable
 	/*
 	 * Getters & Setters
 	 */		
-	private inline function get_cx() 				:Float 		{ return _center.x; }
-	private inline function get_cy() 				:Float 		{ return _center.y; }
-	private inline function get_center()			:Vector2D	{ return _center; }
-	private inline function get_width() 			:Float 		{ return _extents.x * 2; }
-	private inline function get_height() 			:Float 		{ return _extents.y * 2; }
-	private inline function get_hWidth() 			:Float 		{ return _extents.x; }
-	private inline function get_hHeight() 			:Float 		{ return _extents.y; }
-	private inline function get_x()					:Float 		{ return _center.x - _extents.x; }
-	private inline function get_y()					:Float 		{ return _center.y - _extents.y; }
-	private inline function get_minX() 				:Float 		{ return _center.x - _extents.x; }
-	private inline function get_maxX() 				:Float 		{ return _center.x + _extents.x; }
-	private inline function get_minY() 				:Float 		{ return _center.y - _extents.y; }
-	private inline function get_maxY() 				:Float		{ return _center.y + _extents.y; }
-	private inline function get_left() 				:Float 		{ return _center.x - _extents.x; }
-	private inline function get_right()				:Float 		{ return _center.x + _extents.x; }
-	private inline function get_top() 				:Float 		{ return _center.y - _extents.y; }
-	private inline function get_bottom()			:Float		{ return _center.y + _extents.y; }
+	private inline function get_cx() 				: Float 	{ return _center.x; }
+	private inline function get_cy() 				: Float 	{ return _center.y; }
+	private inline function get_center()			: Vector2D	{ return _center; }
+	private inline function get_width() 			: Float 	{ return _extents.x * 2; }
+	private inline function get_height() 			: Float 	{ return _extents.y * 2; }
+	private inline function get_hWidth() 			: Float 	{ return _extents.x; }
+	private inline function get_hHeight() 			: Float 	{ return _extents.y; }
+	private inline function get_x()					: Float 	{ return _center.x - _extents.x; }
+	private inline function get_y()					: Float 	{ return _center.y - _extents.y; }
+	private inline function get_minX() 				: Float 	{ return _center.x - _extents.x; }
+	private inline function get_maxX() 				: Float 	{ return _center.x + _extents.x; }
+	private inline function get_minY() 				: Float 	{ return _center.y - _extents.y; }
+	private inline function get_maxY() 				: Float		{ return _center.y + _extents.y; }
+	private inline function get_left() 				: Float 	{ return _center.x - _extents.x; }
+	private inline function get_right()				: Float 	{ return _center.x + _extents.x; }
+	private inline function get_top() 				: Float 	{ return _center.y - _extents.y; }
+	private inline function get_bottom()			: Float		{ return _center.y + _extents.y; }
 	
-	private inline function set_cx( x:Float ) 		:Float		{ return _center.x = x; }	
-	private inline function set_cy( y:Float ) 		:Float		{ return _center.y = y; }
-	private inline function set_center( pos:Vector2D ) 	:Vector2D	{ _center.x = pos.x; _center.y = pos.y; return _center; }
-	private inline function set_width( w:Float ) 	:Float		{ return _extents.x = w * 0.5; }
-	private inline function set_height( h:Float )	:Float		{ return _extents.y = h * 0.5; }
+	private inline function set_cx( x:Float ) 		: Float		{ return _center.x = x; }	
+	private inline function set_cy( y:Float ) 		: Float		{ return _center.y = y; }
+	private inline function set_center( c:Vector2D ) : Vector2D	
+	{ 
+		_center.x = c.x; 
+		_center.y = c.y; 
+		return _center; 
+	}
+	private inline function set_width( w:Float ) 	: Float		{ return _extents.x = w * 0.5; }
+	private inline function set_height( h:Float )	: Float		{ return _extents.y = h * 0.5; }
 	
 	// adjusts the position based on the new min/max
-	private inline function set_x( x:Float ) 		:Float 		{ return _center.x = x + _extents.x; }
-	private inline function set_y( y:Float ) 		:Float 		{ return _center.y = y + _extents.y; }
-	private inline function set_minX( x:Float ) 	:Float 		{ return _center.x = x + _extents.x; }
-	private inline function set_maxX( x:Float ) 	:Float 		{ return _center.x = x - _extents.x; }
-	private inline function set_minY( y:Float ) 	:Float 		{ return _center.y = y + _extents.y; }
-	private inline function set_maxY( y:Float ) 	:Float 		{ return _center.y = y - _extents.y; }
-	private inline function set_left( x:Float ) 	:Float 		{ return _center.x = x + _extents.x; }
-	private inline function set_right( x:Float ) 	:Float 		{ return _center.x = x - _extents.x; }
-	private inline function set_top( y:Float ) 		:Float 		{ return _center.y = y + _extents.y; }
-	private inline function set_bottom( y:Float ) 	:Float 		{ return _center.y = y - _extents.y; }
+	private inline function set_x( x:Float ) 		: Float 	{ return _center.x = x + _extents.x; }
+	private inline function set_y( y:Float ) 		: Float 	{ return _center.y = y + _extents.y; }
+	private inline function set_minX( x:Float ) 	: Float 	{ return _center.x = x + _extents.x; }
+	private inline function set_maxX( x:Float ) 	: Float 	{ return _center.x = x - _extents.x; }
+	private inline function set_minY( y:Float ) 	: Float 	{ return _center.y = y + _extents.y; }
+	private inline function set_maxY( y:Float ) 	: Float 	{ return _center.y = y - _extents.y; }
+	private inline function set_left( x:Float ) 	: Float 	{ return _center.x = x + _extents.x; }
+	private inline function set_right( x:Float ) 	: Float 	{ return _center.x = x - _extents.x; }
+	private inline function set_top( y:Float ) 		: Float 	{ return _center.y = y + _extents.y; }
+	private inline function set_bottom( y:Float ) 	: Float 	{ return _center.y = y - _extents.y; }
 	
 	/*
 	 * IRecycleable 
@@ -217,7 +238,8 @@ class AABB implements IRecyclable
 
 	public static inline function aabbIntersectsRect( 
 		aabb:AABB, 
-		x:Float, y:Float, width:Float, height:Float ) :Bool
+		x:Float, y:Float, 
+		width:Float, height:Float ) :Bool
 	{
 		var dx = Math.abs(aabb._center.x - x + width * 0.5);
 		var dy = Math.abs(aabb._center.y - y + height * 0.5);

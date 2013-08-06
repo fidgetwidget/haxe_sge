@@ -296,8 +296,8 @@ class Input
 	
 	/* --- Mouse --- */
 	
-	public static var mouseX(get_mouseX, never):Float;
-	public static var mouseY(get_mouseY, never):Float;
+	public static var mouseX(get, never):Float;
+	public static var mouseY(get, never):Float;
 	
 	public static function get_mouseX() :Float { return _mouseCursor.x; }
 	public static function get_mouseY() :Float { return _mouseCursor.y; }
@@ -349,27 +349,27 @@ class Input
 #if (cpp || neko || display)
 	/* --- Joystick --- */
 	
-	public static var lAxisX(getLAxisX, never):Float;
-	public static var lAxisY(getLAxisY, never):Float;
-	public static var rAxisX(getRAxisX, never):Float;
-	public static var rAxisY(getRAxisY, never):Float;
-	public static var lTrigger(getLTrigger, never):Float;
-	public static var rTrigger(getRTrigger, never):Float;
-	public static var hatX(getHatX, never):Float;
-	public static var hatY(getHatY, never):Float;
+	public static var lAxisX(get, never):Float;
+	public static var lAxisY(get, never):Float;
+	public static var rAxisX(get, never):Float;
+	public static var rAxisY(get, never):Float;
+	public static var lTrigger(get, never):Float;
+	public static var rTrigger(get, never):Float;
+	public static var hatX(get, never):Float;
+	public static var hatY(get, never):Float;
 	
-	public static function getLAxisX() :Float { return _lAxis.x; }
-	public static function getLAxisY() :Float { return _lAxis.y; }
-	public static function getRAxisX() :Float { return _rAxis.x; }
-	public static function getRAxisY() :Float { return _rAxis.y; }
-	public static function getLTrigger() :Float { return _lTrigger; }
-	public static function getRTrigger() :Float { return _rTrigger; }
-	public static function getHatX() :Float { return _hat.x; }
-	public static function getHatY() :Float { return _hat.y; }
+	public static function get_lAxisX() :Float { return _lAxis.x; }
+	public static function get_lAxisY() :Float { return _lAxis.y; }
+	public static function get_rAxisX() :Float { return _rAxis.x; }
+	public static function get_rAxisY() :Float { return _rAxis.y; }
+	public static function get_lTrigger() :Float { return _lTrigger; }
+	public static function get_rTrigger() :Float { return _rTrigger; }
+	public static function get_hatX() :Float { return _hat.x; }
+	public static function get_hatY() :Float { return _hat.y; }
 	
-	public static function getLeftAxis() :Point { return _lAxis; }
-	public static function getRightAxis() :Point { return _rAxis; }
-	public static function getHatPoint() :Point { return _hat; }
+	public static function get_leftAxis() :Point { return _lAxis; }
+	public static function get_rightAxis() :Point { return _rAxis; }
+	public static function get_hatPoint() :Point { return _hat; }
 	
 	public static function isButtonDown( btnCode:Int ) :Bool {
 		return _btns[btnCode].current > 0; // 1 or 2
