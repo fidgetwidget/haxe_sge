@@ -21,6 +21,9 @@ import sge.geom.Path;
 
 import sge.particles.Emitter;
 
+/// TODO: add moving the player between planes to attack the different shapes
+
+
 /**
  * Draw a number of basic shapes in a space, and allow dragging of the scene
  * @author fidgetwidget
@@ -130,6 +133,10 @@ class TestScene extends Scene
 			} else {
 				bg.addChild( stars.mc );
 			}
+		}
+		
+		if ( Input.isKeyPressed( Keyboard.NUMBER_2 ) ) {
+			drawBounds = !drawBounds;
 		}
 		
 	}	
@@ -244,6 +251,12 @@ class TestScene extends Scene
 		for (e in tree) {
 			// draw the entity
 			e.render( camera );	
+			
+			if (drawBounds) {
+				_bounds2 = e.get_bounds();
+				Draw.graphics.lineStyle(1, 0xFFFFFF);
+				Draw.debug_drawAABB(_bounds2, camera);
+			}
 		}
 		
 		if (drawStars) 

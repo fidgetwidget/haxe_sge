@@ -50,6 +50,15 @@ class AABB implements IRecyclable
 		_center = new Vector2D(); 
 		_extents = new Vector2D();
 	}
+
+	public function set( x:Float, y:Float, halfWidth:Float, halfHeight:Float ) :AABB
+	{
+		_center.x = x;
+		_center.y = y;
+		_extents.x = halfWidth;
+		_extents.y = halfHeight;
+		return this;
+	}
 	
 	public function setRect( x:Float, y:Float, width:Float, height:Float, fromCenter:Bool = false ) :AABB
 	{		
@@ -58,14 +67,6 @@ class AABB implements IRecyclable
 		_center.x = x + (fromCenter ? 0 : _extents.x);
 		_center.y = y + (fromCenter ? 0 : _extents.y);
 		
-		return this;
-	}
-	public function set_centerHalfs( center_x:Float, center_y:Float, halfWidth:Float, halfHeight:Float ) :AABB
-	{
-		_center.x = center_x;
-		_center.y = center_y;
-		_extents.x = halfWidth;
-		_extents.y = halfHeight;
 		return this;
 	}
 	public function setMinMax( minX:Float, minY:Float, maxX:Float, maxY:Float ) :AABB
@@ -243,8 +244,7 @@ class AABB implements IRecyclable
 	{
 		var dx = Math.abs(aabb._center.x - x + width * 0.5);
 		var dy = Math.abs(aabb._center.y - y + height * 0.5);
-		var xx = ( (aabb.width + width) * 0.5);
-		var yy = ( (aabb.height + height) * 0.5);
+		var xx = ( (aabb.width + width) * 0.5);		var yy = ( (aabb.height + height) * 0.5);
 		return ( xx >= dx && yy >= dy );
 	}
 }

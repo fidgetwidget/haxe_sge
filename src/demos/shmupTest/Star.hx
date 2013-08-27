@@ -34,7 +34,7 @@ class Star extends Entity
 		mc = _shape;
 		
 		_aabb = new AABB();
-		_aabb.set_centerHalfs(0, 0, _radius, _radius);
+		_aabb.set(0, 0, _radius, _radius);
 	}
 	
 	override private function _updateTransform(delta:Float):Void 

@@ -46,7 +46,7 @@ class Circle extends Shape
 	{
 		if (_bounds == null) 
 			_bounds = new AABB();		
-		_bounds.set_centerHalfs(x, y, radius , radius);
+		_bounds.set(x, y, radius , radius);
 		return _bounds;
 	}
 	

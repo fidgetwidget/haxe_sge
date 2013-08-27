@@ -70,7 +70,7 @@ class Enemy extends Entity
 			_isBox = true;
 		}
 		_aabb = new AABB();
-		_aabb.set_centerHalfs(0, 0, size, size);
+		_aabb.set(0, 0, size, size);
 		
 	}
 	
@@ -78,8 +78,6 @@ class Enemy extends Entity
 	{				
 		mc.x = (ix - camera.ix) - (z * (camera.cx - ix)); // add the paralax offset
 		mc.y = (iy - camera.iy) - (z * (camera.cy - iy));
-		_aabb.cx = mc.x;
-		_aabb.cy = mc.y;
 	}
 	
 	override public function get_bounds():AABB 

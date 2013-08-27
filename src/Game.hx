@@ -1,6 +1,6 @@
 package ;
 
-import demos.platformTest.TestScene;
+import demos.shmupTest.TestScene;
 import flash.display.MovieClip;
 import flash.display.Graphics;
 

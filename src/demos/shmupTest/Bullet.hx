@@ -34,7 +34,7 @@ class Bullet extends Entity
 		mc = _shape;
 		
 		_aabb = new AABB();
-		_aabb.set_centerHalfs(0, 0, _radius, _radius * 2);
+		_aabb.set(0, 0, _radius, _radius * 2);
 	}
 	
 	override private function _updateTransform(delta:Float):Void 
