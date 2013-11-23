@@ -3,11 +3,9 @@ haxe_sge
 
 small galaxy engine in haxe using openfl
 
-includes (currently) 3 demos:
+There are a number of demo's available to check out. 
 
-1 [test1]          a simple shape drawing test scene.
+Simply clone the repo, and run openfl test <target [flash, windows, mac, etc]> to run 
+Change the "import demos.<demo of your choosing>.TestScene;" line in the Game.hx file
 
-2 [test2]          a simple collision test scene.
-
-3 [platformTest]   a platform physics test scene.
-
+The project is still in beta, and the master branch is still currently an active development branch
